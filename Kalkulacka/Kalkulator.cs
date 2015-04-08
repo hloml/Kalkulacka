@@ -16,14 +16,19 @@ namespace Kalkulacka
 
         public static void Main(string[] args)
         {
-            LoadExcel("C:\\Users\\user\\Documents\\tarif2.xls");
+            LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
 
             Console.ReadLine();
         }
 
-        public static List<Tarif> LoadExcel(string filename)
+        public static Dictionary<String, List<Tarif>> LoadExcel(string filename)
         {
             Application xlsApp = new Application();
+
+            if (!System.IO.File.Exists(filename))
+            {
+                return null;
+            }
 
             if (xlsApp == null)
             {
@@ -34,8 +39,16 @@ namespace Kalkulacka
             Workbook wb = xlsApp.Workbooks.Open(filename,
                 0, true, 5, "", "", true, XlPlatform.xlWindows, "\t", false, false, 0, true);
             Sheets sheets = wb.Worksheets;
-            Worksheet ws = (Worksheet)sheets.get_Item(1);
 
+            Dictionary<String, List<Tarif>> tarifs_dictionary = new Dictionary<string,List<Tarif>>();
+
+            for (int list_index = 1; list_index <= sheets.Count; list_index++) { 
+
+
+            Worksheet ws = (Worksheet)sheets.get_Item(list_index);
+            
+            
+            
             bool isNumeric, isCategory;
             float column_value;
             int column_index, columns_count = ws.UsedRange.Columns.Count, first_column;
@@ -111,7 +124,7 @@ namespace Kalkulacka
                                 {
                                     dictionary[column_index].Add(first_column.ToString(), s);
                                 }
-                                else
+                                else if (!string.IsNullOrEmpty(first_column_string))
                                 {
                                     dictionary[column_index].Add(first_column_string, s);
                                 }
@@ -139,8 +152,11 @@ namespace Kalkulacka
                     tarifs.Add(tarif);
                 }
             }
+            tarifs_dictionary.Add(ws.Name, tarifs); // ulozeni tarifu do slovniku dle zony(jmeno listu excelu)
+            
 
-            return tarifs;
+            }
+            return tarifs_dictionary;
         }
     }
 }
