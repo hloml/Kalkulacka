@@ -16,7 +16,8 @@ namespace Kalkulacka
 
         public static void Main(string[] args)
         {
-            LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
+            //LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
+            LoadExcel("C:\\Users\\Jára\\workspace\\git\\sracky\\2014_tarif_IDP.xls");
 
             Console.ReadLine();
         }
@@ -157,6 +158,12 @@ namespace Kalkulacka
 
             }
             return tarifs_dictionary;
+        }
+
+        public static String CountTariff(DateTime sinceDate, DateTime untilDate, String discount)
+        {
+
+            return null;
         }
     }
 }
