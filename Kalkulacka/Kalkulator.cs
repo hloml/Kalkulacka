@@ -15,19 +15,29 @@ namespace Kalkulacka
         private const int NUMBER_OF_DAYS = 123;
         private static Dictionary<String, List<Tarif>> tarifDictionary;
 
+        // testing parammeters for console
+        static DateTime startDateG;
+        static DateTime endDateG;
+        static String discount;
+        static String defaultZone = "vnejsi";
+
+
         public static void Main(string[] args)
         {
-            //tarifDictionary = LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
-            tarifDictionary = LoadExcel("C:\\Users\\Jára\\workspace\\git\\tabulky\\tarif2.xls");
-            //Console.WriteLine(tarifDic.get);
+            String tariffPath = System.IO.Path.GetFullPath("..\\..\\operational_tariff.xls");
+            tarifDictionary = LoadExcel(tariffPath);
 
 
-            DateTime startDate = new DateTime(2013, 7, 15);
-            DateTime endDate = new DateTime(2014, 8, 10);
-
-            String countedTariff = CountTariff(startDate, endDate, "ZTP");
             
+            Console.WriteLine("-Pocitani tarifu-");
+            Console.WriteLine();
+            while (true)
+            {
+                InsertValues();
+                String countedTariff = CountTariff(startDateG, endDateG, "ZTP");
 
+
+            }
             Console.ReadLine();
         }
 
@@ -172,34 +182,18 @@ namespace Kalkulacka
 
         public static String CountTariff(DateTime startDate, DateTime endDate, String discount)
         {
-            Console.WriteLine("Pocitani tarifu:");
-            Console.WriteLine();
+            float price;
+            price = CountDaysPrice(startDate, endDate, discount);
+            ErrorWritter(price);
 
+            price = Count380Price(startDate, endDate, discount);
+            ErrorWritter(price);
 
-            float daysPrice = CountDaysPrice(startDate, endDate, discount);
+            price = Count190Price(startDate, endDate, discount);
+            ErrorWritter(price);
 
-            float d380Price = Count380Price(startDate, endDate, discount);
-
-            float d190Price = Count190Price(startDate, endDate, discount);
-
-
-            // vyhodnoceni
-            if (daysPrice < d380Price && daysPrice < d190Price)
-            {
-                Console.WriteLine("Nehvýhodnější je tarif Deního předplatného za {0} kč", daysPrice);
-            }
-            else
-            {
-                if (d380Price < d190Price)
-                {
-                    Console.WriteLine("Nehvýhodnější je tarif Ročního předplatného za {0} kč", d380Price);
-                }
-                else
-                {
-                    Console.WriteLine("Nehvýhodnější je tarif Půlročního předplatného za {0} kč", d190Price);
-                }
-            }
-
+            Console.WriteLine("Stiskni enter pro nove zadani");
+            Console.ReadLine();
 
             return null;
         }
@@ -209,16 +203,14 @@ namespace Kalkulacka
             int daysDifference = DaysDifference(startDate, endDate);
 
             Tarif choosenTariff = TariffChooser(discount);
-            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
-            if (choosenTariff.DayTarif.Length < daysDifference || daysDifference < 1) // rozpeti dnu je zaporne nebo prilis vysoke
+            if (choosenTariff == null) return -1; // discount not found
+            if (choosenTariff.DayTarif.Length < daysDifference || daysDifference < 1) // time between days is too long or less than 0
             {
-                Console.WriteLine("rozpeti dnu je zaporne nebo prilis vysoke pro Denni tarif");
-                Console.WriteLine();
-                return -1;
+                return -4;
             }
 
             float daysPrice = choosenTariff.DayTarif[daysDifference];
-            Console.WriteLine("Cena denního tarifu pro {0} dnů je {1} kč", daysDifference, daysPrice);
+            Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
             Console.WriteLine();
             return daysPrice;
         }
@@ -230,16 +222,16 @@ namespace Kalkulacka
             int yearsDifference = endDate.Year - startDate.Year + 1;
 
             Tarif choosenTariff = TariffChooser(discount);
-            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+            if (choosenTariff == null) return -1; // discount not found
 
             int oneYearPrice;
             float yearsPrice;
             String yearsPriceString;
-            if (!choosenTariff.Dictionary.TryGetValue("380 dní", out yearsPriceString)) return -1; // nenalezeno rocni predplatne
+            if (!choosenTariff.Dictionary.TryGetValue("380 dni", out yearsPriceString)) return -2; // year prepay not found
 
-            if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return -1; // nepodarilo se prevest cenu ze string na int
+            if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return -3; // error in string to int
             yearsPrice = oneYearPrice * yearsDifference;
-            Console.WriteLine("Cena ročního tarifu pro {0} let je {1} kč", yearsDifference, yearsPrice);
+            Console.WriteLine("Cena rocniho tarifu pro {0} let je {1} kc", yearsDifference, yearsPrice);
             Console.WriteLine();
             return yearsPrice;
         }
@@ -251,16 +243,16 @@ namespace Kalkulacka
             int monthsDifference = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
 
             Tarif choosenTariff = TariffChooser(discount);
-            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+            if (choosenTariff == null) return -1; // discount not found
 
             int oneSixMonthsPrice;
             float sixMonthsPrice;
             String sixMonthsPriceString;
-            if (!choosenTariff.Dictionary.TryGetValue("190 dní", out sixMonthsPriceString)) return -1; // nenalezeno pulrocni predplatne
+            if (!choosenTariff.Dictionary.TryGetValue("190 dni", out sixMonthsPriceString)) return -2; // half-year prepay not found
 
-            if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -1; // nepodarilo se prevest cenu ze string na int
+            if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -3; // error in string to int
             sixMonthsPrice = oneSixMonthsPrice * (monthsDifference / 6 + 1);
-            Console.WriteLine("Cena půlročního tarifu pro {0} měsíců je {1} kč", monthsDifference, sixMonthsPrice);
+            Console.WriteLine("Cena pulrocniho tarifu pro {0} mesicu je {1} kc", monthsDifference, sixMonthsPrice);
             Console.WriteLine();
             return sixMonthsPrice;
         }
@@ -268,17 +260,17 @@ namespace Kalkulacka
         public static int DaysDifference(DateTime startDate, DateTime endDate)
         {
             int daysDifference = (int)(endDate.Date - startDate.Date).TotalDays + 1;
-            Console.WriteLine("od {0} do {1} ; {2} dnů", startDate, endDate, daysDifference);
+            Console.WriteLine("od {0} do {1} ; {2} dnu", startDate, endDate, daysDifference);
             return daysDifference;
         }
 
         public static Tarif TariffChooser(String discount)
         {
-            List<Tarif> listTarif;
-            if (!tarifDictionary.TryGetValue("předplatné - vnější zóny", out listTarif)) return null; // nenalezeny zony
+            List<Tarif> listTariff = ListTariff(defaultZone);
+            if (listTariff == null) return null; // zones not found
             Tarif choosenTariff = null;
-            Console.WriteLine("předplatné - vnější zóny - ok");
-            foreach (Tarif tariff in listTarif)
+            Console.WriteLine("predplatne - vnejsi zony - ok");
+            foreach (Tarif tariff in listTariff)
             {
                 if (tariff.category.Equals(discount))
                 {
@@ -288,6 +280,92 @@ namespace Kalkulacka
                 }
             }
             return choosenTariff;
+        }
+
+        public static List<Tarif> ListTariff(String zone)
+        {
+            List<Tarif> listTariff;
+            if (!tarifDictionary.TryGetValue(zone, out listTariff)) return null; // zones not found
+            return listTariff;
+        }
+
+
+
+        public static void InsertValues()
+        {
+            String sYear, sMonth, sDay;
+            int y, m, d;
+            Console.WriteLine("Zadej datum od:");
+            Console.Write("Rok: ");
+            sYear = Console.ReadLine();
+            Console.Write("Mesic: ");
+            sMonth = Console.ReadLine();
+            Console.Write("Den: ");
+            sDay = Console.ReadLine();
+            y = Int32.Parse(sYear);
+            m = Int32.Parse(sMonth);
+            d = Int32.Parse(sDay);
+            startDateG = new DateTime(y, m, d);
+
+            Console.WriteLine();
+            Console.WriteLine("Zadej datum do:");
+            Console.Write("Rok: ");
+            sYear = Console.ReadLine();
+            Console.Write("Mesic: ");
+            sMonth = Console.ReadLine();
+            Console.Write("Den: ");
+            sDay = Console.ReadLine();
+            y = Int32.Parse(sYear);
+            m = Int32.Parse(sMonth);
+            d = Int32.Parse(sDay);
+            endDateG = new DateTime(y, m, d);
+
+            Console.WriteLine();
+            StringBuilder builder = new StringBuilder();
+            List<Tarif> listTariff = ListTariff(defaultZone);
+            if (listTariff == null)
+            {
+                Console.WriteLine("ERR: List tarifu je null");
+            }
+            else
+            {
+                foreach (Tarif tariff in listTariff)
+                {
+                    builder.Append(tariff.category).Append(", ");
+                }
+            }
+            string result = builder.ToString();
+            Console.WriteLine("Zadej nazev slevy({0}):", result);
+            discount = Console.ReadLine();
+
+
+            Console.WriteLine();
+            Console.WriteLine("------------------------------");
+            Console.WriteLine();
+
+        }
+
+        public static void ErrorWritter(float errNumberF)
+        {
+            int errNumber = (int)errNumberF;
+            if (errNumber < 0)
+            {
+                String errMsg;
+                switch (errNumber)
+                {
+                    case -1: errMsg = "nenalezena pozadovana sleva";
+                        break;
+                    case -2: errMsg = "nenalezeno takove predplatne";
+                        break;
+                    case -3: errMsg = "nepodarilo se prevest cenu ze string na int";
+                        break;
+                    case -4: errMsg = "rozpeti dnu je zaporne nebo prilis vysoke pro Denni tarif";
+                        break;
+                    default: errMsg = "jina chyba";
+                        break;
+                }
+                Console.WriteLine("ERR: {0}", errMsg);
+            }
         }
     }
 }
