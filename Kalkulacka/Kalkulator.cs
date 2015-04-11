@@ -23,7 +23,7 @@ namespace Kalkulacka
 
 
             DateTime startDate = new DateTime(2013, 7, 15);
-            DateTime endDate = new DateTime(2013, 8, 10);
+            DateTime endDate = new DateTime(2014, 8, 10);
 
             String countedTariff = CountTariff(startDate, endDate, "ZTP");
             
@@ -173,12 +173,32 @@ namespace Kalkulacka
         public static String CountTariff(DateTime startDate, DateTime endDate, String discount)
         {
             Console.WriteLine("Pocitani tarifu:");
+            Console.WriteLine();
 
-            CountDaysPrice(startDate, endDate, discount);
 
-            //Count380Price();
+            float daysPrice = CountDaysPrice(startDate, endDate, discount);
 
-            //Count190Price();
+            float d380Price = Count380Price(startDate, endDate, discount);
+
+            float d190Price = Count190Price(startDate, endDate, discount);
+
+
+            // vyhodnoceni
+            if (daysPrice < d380Price && daysPrice < d190Price)
+            {
+                Console.WriteLine("Nehvýhodnější je tarif Deního předplatného za {0} kč", daysPrice);
+            }
+            else
+            {
+                if (d380Price < d190Price)
+                {
+                    Console.WriteLine("Nehvýhodnější je tarif Ročního předplatného za {0} kč", d380Price);
+                }
+                else
+                {
+                    Console.WriteLine("Nehvýhodnější je tarif Půlročního předplatného za {0} kč", d190Price);
+                }
+            }
 
 
             return null;
@@ -187,8 +207,75 @@ namespace Kalkulacka
 
         public static float CountDaysPrice(DateTime startDate, DateTime endDate, String discount) {
             int daysDifference = DaysDifference(startDate, endDate);
+
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+            if (choosenTariff.DayTarif.Length < daysDifference || daysDifference < 1) // rozpeti dnu je zaporne nebo prilis vysoke
+            {
+                Console.WriteLine("rozpeti dnu je zaporne nebo prilis vysoke pro Denni tarif");
+                Console.WriteLine();
+                return -1;
+            }
+
+            float daysPrice = choosenTariff.DayTarif[daysDifference];
+            Console.WriteLine("Cena denního tarifu pro {0} dnů je {1} kč", daysDifference, daysPrice);
+            Console.WriteLine();
+            return daysPrice;
+        }
+
+
+        public static float Count380Price(DateTime startDate, DateTime endDate, String discount)
+        {
+            int daysDifference = DaysDifference(startDate, endDate);
+            int yearsDifference = endDate.Year - startDate.Year + 1;
+
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+
+            int oneYearPrice;
+            float yearsPrice;
+            String yearsPriceString;
+            if (!choosenTariff.Dictionary.TryGetValue("380 dní", out yearsPriceString)) return -1; // nenalezeno rocni predplatne
+
+            if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return -1; // nepodarilo se prevest cenu ze string na int
+            yearsPrice = oneYearPrice * yearsDifference;
+            Console.WriteLine("Cena ročního tarifu pro {0} let je {1} kč", yearsDifference, yearsPrice);
+            Console.WriteLine();
+            return yearsPrice;
+        }
+
+
+        public static float Count190Price(DateTime startDate, DateTime endDate, String discount)
+        {
+            int daysDifference = DaysDifference(startDate, endDate);
+            int monthsDifference = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
+
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+
+            int oneSixMonthsPrice;
+            float sixMonthsPrice;
+            String sixMonthsPriceString;
+            if (!choosenTariff.Dictionary.TryGetValue("190 dní", out sixMonthsPriceString)) return -1; // nenalezeno pulrocni predplatne
+
+            if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -1; // nepodarilo se prevest cenu ze string na int
+            sixMonthsPrice = oneSixMonthsPrice * (monthsDifference / 6 + 1);
+            Console.WriteLine("Cena půlročního tarifu pro {0} měsíců je {1} kč", monthsDifference, sixMonthsPrice);
+            Console.WriteLine();
+            return sixMonthsPrice;
+        }
+
+        public static int DaysDifference(DateTime startDate, DateTime endDate)
+        {
+            int daysDifference = (int)(endDate.Date - startDate.Date).TotalDays + 1;
+            Console.WriteLine("od {0} do {1} ; {2} dnů", startDate, endDate, daysDifference);
+            return daysDifference;
+        }
+
+        public static Tarif TariffChooser(String discount)
+        {
             List<Tarif> listTarif;
-            if (!tarifDictionary.TryGetValue("předplatné - vnější zóny", out listTarif)) return -1; // nenalezeny zony
+            if (!tarifDictionary.TryGetValue("předplatné - vnější zóny", out listTarif)) return null; // nenalezeny zony
             Tarif choosenTariff = null;
             Console.WriteLine("předplatné - vnější zóny - ok");
             foreach (Tarif tariff in listTarif)
@@ -200,33 +287,7 @@ namespace Kalkulacka
                     break;
                 }
             }
-            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
-            if (choosenTariff.DayTarif.Length < daysDifference && daysDifference < 1) return -1; // rozpeti dnu je zaporne nebo prilis vysoke
-
-            float daysPrice = choosenTariff.DayTarif[daysDifference];
-            Console.WriteLine("Cena denního tarifu pro {0} dnů je {1} kč", daysDifference, daysPrice);
-            return daysPrice;
-        }
-
-
-        public static float Count380Price(DateTime startDate, DateTime endDate, String discount)
-        {
-            
-            return 0;
-        }
-
-
-        public static float Count190Price(DateTime startDate, DateTime endDate, String discount)
-        {
-            
-            return 0;
-        }
-
-        public static int DaysDifference(DateTime startDate, DateTime endDate)
-        {
-            int daysDifference = (int)(endDate.Date - startDate.Date).TotalDays + 1;
-            Console.WriteLine("od {0} do {1} ; {2} dnů", startDate, endDate, daysDifference);
-            return daysDifference;
+            return choosenTariff;
         }
     }
 }
