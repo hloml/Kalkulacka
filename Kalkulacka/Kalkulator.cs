@@ -17,10 +17,9 @@ namespace Kalkulacka
 
         public static void Main(string[] args)
         {
-            //tarifDictionary = LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
+            //tarifDictionary = LoadExcel("C:\\Users\\user\\Documents\\tarif2.xls");
             tarifDictionary = LoadExcel("C:\\Users\\Jára\\workspace\\git\\tabulky\\tarif2.xls");
-            //Console.WriteLine(tarifDic.get);
-
+            
 
             DateTime startDate = new DateTime(2013, 7, 15);
             DateTime endDate = new DateTime(2013, 8, 10);
@@ -37,6 +36,7 @@ namespace Kalkulacka
 
             if (!System.IO.File.Exists(filename))
             {
+                Console.WriteLine("File doesnt exist");
                 return null;
             }
 
@@ -154,6 +154,7 @@ namespace Kalkulacka
                     Tarif tarif = new Tarif();
                     tarif.category = category[i];
 
+                    tmp_array = new float[NUMBER_OF_DAYS + 1];
                     for (int j = 0; j <= NUMBER_OF_DAYS; j++)
                         tmp_array[j] = days_tarif[i, j];
 
