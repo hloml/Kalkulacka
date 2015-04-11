@@ -13,11 +13,20 @@ namespace Kalkulacka
     class Kalkulator
     {
         private const int NUMBER_OF_DAYS = 123;
+        private static Dictionary<String, List<Tarif>> tarifDictionary;
 
         public static void Main(string[] args)
         {
-            //LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
-            LoadExcel("C:\\Users\\Jára\\workspace\\git\\sracky\\2014_tarif_IDP.xls");
+            //tarifDictionary = LoadExcel("C:\\Users\\Lada\\Documents\\tarif.xls");
+            tarifDictionary = LoadExcel("C:\\Users\\Jára\\workspace\\git\\tabulky\\tarif2.xls");
+            //Console.WriteLine(tarifDic.get);
+
+
+            DateTime startDate = new DateTime(2013, 7, 15);
+            DateTime endDate = new DateTime(2013, 8, 10);
+
+            String countedTariff = CountTariff(startDate, endDate, "ZTP");
+            
 
             Console.ReadLine();
         }
@@ -159,11 +168,65 @@ namespace Kalkulacka
             }
             return tarifs_dictionary;
         }
+        
 
-        public static String CountTariff(DateTime sinceDate, DateTime untilDate, String discount)
+        public static String CountTariff(DateTime startDate, DateTime endDate, String discount)
         {
+            Console.WriteLine("Pocitani tarifu:");
+
+            CountDaysPrice(startDate, endDate, discount);
+
+            //Count380Price();
+
+            //Count190Price();
+
 
             return null;
+        }
+
+
+        public static float CountDaysPrice(DateTime startDate, DateTime endDate, String discount) {
+            int daysDifference = DaysDifference(startDate, endDate);
+            List<Tarif> listTarif;
+            if (!tarifDictionary.TryGetValue("předplatné - vnější zóny", out listTarif)) return -1; // nenalezeny zony
+            Tarif choosenTariff = null;
+            Console.WriteLine("předplatné - vnější zóny - ok");
+            foreach (Tarif tariff in listTarif)
+            {
+                if (tariff.category.Equals(discount))
+                {
+                    Console.WriteLine("sleva {0} - ok", discount);
+                    choosenTariff = tariff;
+                    break;
+                }
+            }
+            if (choosenTariff == null) return -1; // nenalezena pozadovana sleva
+            if (choosenTariff.DayTarif.Length < daysDifference && daysDifference < 1) return -1; // rozpeti dnu je zaporne nebo prilis vysoke
+
+            float daysPrice = choosenTariff.DayTarif[daysDifference];
+            Console.WriteLine("Cena denního tarifu pro {0} dnů je {1} kč", daysDifference, daysPrice);
+            return daysPrice;
+        }
+
+
+        public static float Count380Price(DateTime startDate, DateTime endDate, String discount)
+        {
+            
+            return 0;
+        }
+
+
+        public static float Count190Price(DateTime startDate, DateTime endDate, String discount)
+        {
+            
+            return 0;
+        }
+
+        public static int DaysDifference(DateTime startDate, DateTime endDate)
+        {
+            int daysDifference = (int)(endDate.Date - startDate.Date).TotalDays + 1;
+            Console.WriteLine("od {0} do {1} ; {2} dnů", startDate, endDate, daysDifference);
+            return daysDifference;
         }
     }
 }
