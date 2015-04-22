@@ -27,16 +27,39 @@ namespace Kalkulacka
             String tariffPath = System.IO.Path.GetFullPath("..\\..\\operational_tariff.xls");
             tarifDictionary = LoadExcel(tariffPath);
 
+            startDateG = new DateTime(2015, 1, 1);
+            endDateG = new DateTime(2015, 6, 1);
+            discount = "plne";
+            CountTariff(startDateG, endDateG, discount);
 
-            
-            Console.WriteLine("-Pocitani tarifu-");
-            Console.WriteLine();
-            while (true)
-            {
-                InsertValues();
-                String countedTariff = CountTariff(startDateG, endDateG, discount);
 
-            }
+            startDateG = new DateTime(2015, 1, 25);
+            endDateG = new DateTime(2019, 6, 1);
+            discount = "plne";
+            CountTariff(startDateG, endDateG, discount);
+
+
+
+            startDateG = new DateTime(2015, 10, 1);
+            endDateG = new DateTime(2016, 4, 1);
+            discount = "plne";
+            CountTariff(startDateG, endDateG, discount);
+
+
+            startDateG = new DateTime(2015, 9, 1);
+            endDateG = new DateTime(2016, 4, 1);
+            discount = "plne";
+            CountTariff(startDateG, endDateG, discount);
+
+
+            //Console.WriteLine("-Pocitani tarifu-");
+            //Console.WriteLine();
+            //while (true)
+            //{
+            //    InsertValues();
+            //    String countedTariff = CountTariff(startDateG, endDateG, discount);
+
+            //}
         }
 
 
@@ -202,21 +225,131 @@ namespace Kalkulacka
         // counts prices for day, year and half-year tariffs
         public static String CountTariff(DateTime startDate, DateTime endDate, String discount)
         {
-            float price;
-            price = CountDaysPrice(startDate, endDate, discount);
-            ErrorWritter(price);
+            float price=0, bestPrice = float.MaxValue;
+            //price = CountDaysPrice(startDate, endDate, discount);
+            //ErrorWritter(price);
 
-            price = Count380Price(startDate, endDate, discount);
-            ErrorWritter(price);
+            //price = Count380Price(startDate, endDate, discount);
+            //ErrorWritter(price);
 
-            price = Count190Price(startDate, endDate, discount);
-            ErrorWritter(price);
+            //price = Count190Price(startDate, endDate, discount);
+            //ErrorWritter(price);
 
+
+
+            int daysDifference = DaysDifference(startDate, endDate);
+            int yearsDifference = endDate.Year - startDate.Year ;
+            Console.WriteLine("pocet dnu {0} ", daysDifference);
+
+            if (yearsDifference > 1)    // roky mezi nima maj rocni jizdny a tamto dopocitat
+            {
+                price = Count380Price(startDate, endDate, discount) * (yearsDifference -1);
+                price += bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
+                price += bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
+                if (bestPrice > price) bestPrice = price;
+                Console.WriteLine("cena za vice let {0} ", price);
+            }
+            else if (yearsDifference == 1)  // musime zkusit zkombinovat mezi obema rokama
+            {
+                price += bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
+                price += bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
+                if (bestPrice > price) bestPrice = price;
+
+                price = bestPriceForYear(startDate, endDate, discount);
+
+                if (bestPrice > price) bestPrice = price;
+
+            }
+            else                        //pro jeden rok kouknout co se nejvic vyplati
+            {
+                bestPrice = bestPriceForYear(startDate, endDate, discount);
+            }
+
+            Console.WriteLine("Nejlepsi cena je {0}", bestPrice);
             Console.WriteLine("Stiskni enter pro nove zadani");
             Console.ReadLine();
-
             return null;
         }
+
+
+
+        public static float bestPriceForYear(DateTime startDate, DateTime endDate, String discount)
+        {
+            int daysDifference = DaysDifference(startDate, endDate);
+            float price = 0;
+            float bestPrice = Count380Price(startDate, endDate, discount);    // zkusime rocni
+        
+
+
+            Console.WriteLine("cena {0} - rocni", price);
+
+            if (daysDifference > 190)                                   // vetsi nez pulrocni, zkusime nakombinovat
+            {
+                price = Count190Price(startDate, endDate, discount);
+                price += CountForRemainingDays(daysDifference - 190);
+
+                if (bestPrice > price) bestPrice = price;
+
+                price = Count190Price(startDate, endDate, discount) * 2;
+                price += CountForRemainingDays(daysDifference - 380);
+
+                if (bestPrice > price)  bestPrice = price;
+                
+
+                Console.WriteLine("cena {0} - vic nez pul rocni", price);
+            }
+            else                                           // porovname pulrocni a denni
+            {
+                price = Count190Price(startDate, endDate, discount);
+                Console.WriteLine("cena {0} - pulrocni", price);
+                price = CountForRemainingDays(daysDifference);
+                if (bestPrice > price) bestPrice = price;
+
+                Console.WriteLine("cena {0} - kombinovana", price);
+            }
+            return bestPrice;
+        }
+
+
+
+        // metoda dopocita cenu pro zbyvajici pocet dnu (ikdyz je vetsi nez 123)
+        public static float CountForRemainingDays(int days)
+        {
+            float price = 0;
+
+            while (days > 0) {
+                if (days > NUMBER_OF_DAYS)
+                {
+                    price += CountDaysPrice2(NUMBER_OF_DAYS, discount);
+                    days -= NUMBER_OF_DAYS;
+                }
+                else
+                {
+                    price += CountDaysPrice2(days, discount);
+                    days = 0;
+                }          
+            }
+
+
+            return price;
+        }
+
+
+        public static float CountDaysPrice2(int daysDifference, String discount)
+        {
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // discount not found
+            if (choosenTariff.DayTarif.Length < daysDifference || daysDifference < 1) // time between days is too long or less than 0
+            {
+                return -4;
+            }
+
+            float daysPrice = choosenTariff.DayTarif[daysDifference];
+        //    Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
+            Console.WriteLine();
+            return daysPrice;
+        }
+
 
         // count price for day tariff
         public static float CountDaysPrice(DateTime startDate, DateTime endDate, String discount) {
@@ -230,7 +363,7 @@ namespace Kalkulacka
             }
 
             float daysPrice = choosenTariff.DayTarif[daysDifference];
-            Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
+         //   Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
             Console.WriteLine();
             return daysPrice;
         }
@@ -245,15 +378,15 @@ namespace Kalkulacka
             if (choosenTariff == null) return -1; // discount not found
 
             int oneYearPrice;
-            float yearsPrice;
+        //    float yearsPrice;
             String yearsPriceString;
             if (!choosenTariff.Dictionary.TryGetValue("380 dni", out yearsPriceString)) return -2; // year prepay not found
 
             if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return -3; // error in string to int
-            yearsPrice = oneYearPrice * yearsDifference;
-            Console.WriteLine("Cena rocniho tarifu pro {0} let je {1} kc", yearsDifference, yearsPrice);
+        //    yearsPrice = oneYearPrice * yearsDifference;
+          //  Console.WriteLine("Cena rocniho tarifu pro {0} let je {1} kc", yearsDifference, yearsPrice);
             Console.WriteLine();
-            return yearsPrice;
+            return oneYearPrice;
         }
 
         // count price for half-year tariff
@@ -266,15 +399,15 @@ namespace Kalkulacka
             if (choosenTariff == null) return -1; // discount not found
 
             int oneSixMonthsPrice;
-            float sixMonthsPrice;
+      //      float sixMonthsPrice;
             String sixMonthsPriceString;
             if (!choosenTariff.Dictionary.TryGetValue("190 dni", out sixMonthsPriceString)) return -2; // half-year prepay not found
 
             if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -3; // error in string to int
-            sixMonthsPrice = oneSixMonthsPrice * (monthsDifference / 6 + 1);
-            Console.WriteLine("Cena pulrocniho tarifu pro {0} mesicu je {1} kc", monthsDifference, sixMonthsPrice);
+        //    sixMonthsPrice = oneSixMonthsPrice * (monthsDifference / 6 + 1);
+       //     Console.WriteLine("Cena pulrocniho tarifu pro {0} mesicu je {1} kc", monthsDifference, sixMonthsPrice);
             Console.WriteLine();
-            return sixMonthsPrice;
+            return oneSixMonthsPrice;
         }
 
         // counts day difference between start and end date
