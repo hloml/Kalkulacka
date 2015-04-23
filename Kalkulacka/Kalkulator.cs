@@ -286,21 +286,49 @@ namespace Kalkulacka
             if (daysDifference > 190)                                   // vetsi nez pulrocni, zkusime nakombinovat
             {
                 price = Count190Price(startDate, endDate, discount);
-                price += CountForRemainingDays(daysDifference - 190);
+                price += CountForRemainingDays(daysDifference - 190 + startDate.Day);       //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
 
                 if (bestPrice > price) bestPrice = price;
 
+                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+
+                price = CountForRemainingDays(daysInMonth - startDate.Day); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += Count190Price(startDate, endDate, discount);
+                price += CountForRemainingDays(daysDifference - 190);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+
+                if (bestPrice > price) bestPrice = price;
+
+
+
                 price = Count190Price(startDate, endDate, discount) * 2;
-                price += CountForRemainingDays(daysDifference - 380);
+                price += CountForRemainingDays(daysDifference - 380 + startDate.Day);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
 
                 if (bestPrice > price)  bestPrice = price;
-                
+
+                price = CountForRemainingDays(daysInMonth - startDate.Day);
+                price += Count190Price(startDate, endDate, discount) * 2;
+                price += CountForRemainingDays(daysDifference - 380);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+
+                if (bestPrice > price) bestPrice = price;
+
 
                 Console.WriteLine("cena {0} - vic nez pul rocni", price);
             }
             else                                           // porovname pulrocni a denni
             {
+
+                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+
+                price = CountForRemainingDays(daysInMonth - startDate.Day);
+                price += Count190Price(startDate, endDate, discount);
+
+                if (bestPrice > price) bestPrice = price;
+
                 price = Count190Price(startDate, endDate, discount);
+                price += CountForRemainingDays(daysDifference - 190 + startDate.Day);
+                
+                if (bestPrice > price) bestPrice = price;
+
                 Console.WriteLine("cena {0} - pulrocni", price);
                 price = CountForRemainingDays(daysDifference);
                 if (bestPrice > price) bestPrice = price;
