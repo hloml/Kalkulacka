@@ -247,7 +247,7 @@ namespace Kalkulacka
                 price += bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
                 price += bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
                 if (bestPrice > price) bestPrice = price;
-                Console.WriteLine("cena za vice let {0} ", price);
+
             }
             else if (yearsDifference == 1)  // musime zkusit zkombinovat mezi obema rokama
             {
@@ -266,8 +266,7 @@ namespace Kalkulacka
             }
 
             Console.WriteLine("Nejlepsi cena je {0}", bestPrice);
-            Console.WriteLine("Stiskni enter pro nove zadani");
-            Console.ReadLine();
+            Console.WriteLine("");
             return null;
         }
 
@@ -278,29 +277,40 @@ namespace Kalkulacka
             int daysDifference = DaysDifference(startDate, endDate);
             float price = 0;
             float bestPrice = Count380Price(startDate, endDate, discount);    // zkusime rocni
-        
+            DateTime tmpDate;
 
-
-            Console.WriteLine("cena {0} - rocni", price);
-
+           List<TarifItem> tarifItems = new List<TarifItem>();
+            
             if (daysDifference > 190)                                   // vetsi nez pulrocni, zkusime nakombinovat
             {
                 price = Count190Price(startDate, endDate, discount);
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190)});
                 price += CountForRemainingDays(daysDifference - 190 + startDate.Day);       //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItems.Add(new TarifItem { days = daysDifference - 190, dateStart = startDate.AddDays(190), dateEnd = endDate});
+
 
                 if (bestPrice > price) bestPrice = price;
 
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
                 price = CountForRemainingDays(daysInMonth - startDate.Day); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tmpDate = startDate.AddDays(190);
+                tarifItems.Add(new TarifItem { days = daysInMonth - startDate.Day, dateStart = startDate, dateEnd = startDate.AddDays(daysInMonth - startDate.Day) });
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = tmpDate });
                 price += Count190Price(startDate, endDate, discount);
                 price += CountForRemainingDays(daysDifference - 190);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                if (daysDifference - 190 > 0) tarifItems.Add(new TarifItem { days = daysDifference - 190, dateStart = tmpDate, dateEnd = endDate});
+
 
                 if (bestPrice > price) bestPrice = price;
 
 
 
                 price = Count190Price(startDate, endDate, discount) * 2;
+                tmpDate = startDate.AddDays(190);
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = tmpDate });
+                tarifItems.Add(new TarifItem { days = 190, dateStart = tmpDate, dateEnd = tmpDate.AddDays(190) });
+                tarifItems.Add(new TarifItem { days = daysDifference - 380 + startDate.Day, dateStart = startDate.AddDays(380), dateEnd = endDate });
                 price += CountForRemainingDays(daysDifference - 380 + startDate.Day);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
 
                 if (bestPrice > price)  bestPrice = price;
@@ -311,8 +321,6 @@ namespace Kalkulacka
 
                 if (bestPrice > price) bestPrice = price;
 
-
-                Console.WriteLine("cena {0} - vic nez pul rocni", price);
             }
             else                                           // porovname pulrocni a denni
             {
@@ -329,14 +337,13 @@ namespace Kalkulacka
                 
                 if (bestPrice > price) bestPrice = price;
 
-                Console.WriteLine("cena {0} - pulrocni", price);
                 price = CountForRemainingDays(daysDifference);
                 if (bestPrice > price) bestPrice = price;
 
-                Console.WriteLine("cena {0} - kombinovana", price);
             }
             return bestPrice;
         }
+
 
 
 
@@ -373,8 +380,7 @@ namespace Kalkulacka
             }
 
             float daysPrice = choosenTariff.DayTarif[daysDifference];
-        //    Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
-            Console.WriteLine();
+
             return daysPrice;
         }
 
@@ -391,8 +397,7 @@ namespace Kalkulacka
             }
 
             float daysPrice = choosenTariff.DayTarif[daysDifference];
-         //   Console.WriteLine("Cena denniho tarifu pro {0} dnu je {1} kc", daysDifference, daysPrice);
-            Console.WriteLine();
+
             return daysPrice;
         }
 
@@ -412,8 +417,7 @@ namespace Kalkulacka
 
             if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return -3; // error in string to int
         //    yearsPrice = oneYearPrice * yearsDifference;
-          //  Console.WriteLine("Cena rocniho tarifu pro {0} let je {1} kc", yearsDifference, yearsPrice);
-            Console.WriteLine();
+
             return oneYearPrice;
         }
 
@@ -434,7 +438,6 @@ namespace Kalkulacka
             if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -3; // error in string to int
         //    sixMonthsPrice = oneSixMonthsPrice * (monthsDifference / 6 + 1);
        //     Console.WriteLine("Cena pulrocniho tarifu pro {0} mesicu je {1} kc", monthsDifference, sixMonthsPrice);
-            Console.WriteLine();
             return oneSixMonthsPrice;
         }
 
