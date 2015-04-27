@@ -51,7 +51,7 @@ namespace Kalkulacka
             discount = "plne";
             CountTariff(startDateG, endDateG, discount);
 
-
+            Console.ReadLine();
             //Console.WriteLine("-Pocitani tarifu-");
             //Console.WriteLine();
             //while (true)
@@ -235,34 +235,83 @@ namespace Kalkulacka
             //price = Count190Price(startDate, endDate, discount);
             //ErrorWritter(price);
 
-
+            List<TarifItem> tarifItems = new List<TarifItem>();
 
             int daysDifference = DaysDifference(startDate, endDate);
             int yearsDifference = endDate.Year - startDate.Year ;
+            DateTime tmpDate;
+            TarifItemsContainer tarifItemsContainer;
+            List<TarifItem> bestTarifItems = new List<TarifItem>();
             Console.WriteLine("pocet dnu {0} ", daysDifference);
 
             if (yearsDifference > 1)    // roky mezi nima maj rocni jizdny a tamto dopocitat
             {
                 price = Count380Price(startDate, endDate, discount) * (yearsDifference -1);
-                price += bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
-                price += bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
-                if (bestPrice > price) bestPrice = price;
+                tmpDate = startDate;
+                for (int i = 1; i < yearsDifference - 1; i++)
+                {
+                    tarifItems.Add(new TarifItem { days = 380, dateStart = tmpDate, dateEnd = tmpDate.AddDays(380) });
+                    tmpDate = tmpDate.AddDays(380);
+                }
+
+
+                tarifItemsContainer = bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+                tarifItemsContainer = bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
             }
             else if (yearsDifference == 1)  // musime zkusit zkombinovat mezi obema rokama
             {
-                price += bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
-                price += bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
-                if (bestPrice > price) bestPrice = price;
+                tarifItemsContainer = bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), discount);
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
-                price = bestPriceForYear(startDate, endDate, discount);
+                tarifItemsContainer = bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount);
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
-                if (bestPrice > price) bestPrice = price;
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
+
+                tarifItemsContainer = bestPriceForYear(startDate, endDate, discount);
+                price = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
             }
             else                        //pro jeden rok kouknout co se nejvic vyplati
             {
-                bestPrice = bestPriceForYear(startDate, endDate, discount);
+                tarifItemsContainer = bestPriceForYear(startDate, endDate, discount);
+                bestPrice = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                }
+                tarifItems.Clear();
             }
 
             Console.WriteLine("Nejlepsi cena je {0}", bestPrice);
@@ -272,54 +321,96 @@ namespace Kalkulacka
 
 
 
-        public static float bestPriceForYear(DateTime startDate, DateTime endDate, String discount)
+        public static TarifItemsContainer bestPriceForYear(DateTime startDate, DateTime endDate, String discount)
         {
             int daysDifference = DaysDifference(startDate, endDate);
             float price = 0;
             float bestPrice = Count380Price(startDate, endDate, discount);    // zkusime rocni
             DateTime tmpDate;
 
-           List<TarifItem> tarifItems = new List<TarifItem>();
-            
+            List<TarifItem> tarifItems = new List<TarifItem>();
+            List<TarifItem> bestTarifItems = new List<TarifItem>();
+            TarifItemsContainer tarifItemsContainer;
+
             if (daysDifference > 190)                                   // vetsi nez pulrocni, zkusime nakombinovat
             {
                 price = Count190Price(startDate, endDate, discount);
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190)});
-                price += CountForRemainingDays(daysDifference - 190 + startDate.Day);       //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
-                tarifItems.Add(new TarifItem { days = daysDifference - 190, dateStart = startDate.AddDays(190), dateEnd = endDate});
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190));   //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += tarifItemsContainer.price;      
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
 
-                if (bestPrice > price) bestPrice = price;
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
+
 
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                price = CountForRemainingDays(daysInMonth - startDate.Day); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day))); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice      
+                price = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
                 tmpDate = startDate.AddDays(190);
-                tarifItems.Add(new TarifItem { days = daysInMonth - startDate.Day, dateStart = startDate, dateEnd = startDate.AddDays(daysInMonth - startDate.Day) });
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = tmpDate });
                 price += Count190Price(startDate, endDate, discount);
-                price += CountForRemainingDays(daysDifference - 190);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
-                if (daysDifference - 190 > 0) tarifItems.Add(new TarifItem { days = daysDifference - 190, dateStart = tmpDate, dateEnd = endDate});
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190, tmpDate);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
 
-                if (bestPrice > price) bestPrice = price;
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
 
 
                 price = Count190Price(startDate, endDate, discount) * 2;
-                tmpDate = startDate.AddDays(190);
-                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = tmpDate });
+                tmpDate = startDate.AddDays(190 - startDate.Day);
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate.AddDays(-startDate.Day), dateEnd = tmpDate });
                 tarifItems.Add(new TarifItem { days = 190, dateStart = tmpDate, dateEnd = tmpDate.AddDays(190) });
-                tarifItems.Add(new TarifItem { days = daysDifference - 380 + startDate.Day, dateStart = startDate.AddDays(380), dateEnd = endDate });
-                price += CountForRemainingDays(daysDifference - 380 + startDate.Day);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
 
-                if (bestPrice > price)  bestPrice = price;
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 380 + startDate.Day, startDate.AddDays(380));     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
-                price = CountForRemainingDays(daysInMonth - startDate.Day);
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
+
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
                 price += Count190Price(startDate, endDate, discount) * 2;
-                price += CountForRemainingDays(daysDifference - 380);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tmpDate = startDate.AddDays(190 + daysInMonth - startDate.Day);
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate.AddDays(daysInMonth - startDate.Day), dateEnd = tmpDate });
+                tarifItems.Add(new TarifItem { days = 190, dateStart = tmpDate, dateEnd = tmpDate.AddDays(190) });
+  
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 380, tmpDate.AddDays(190));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
-                if (bestPrice > price) bestPrice = price;
+
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
             }
             else                                           // porovname pulrocni a denni
@@ -327,46 +418,88 @@ namespace Kalkulacka
 
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                price = CountForRemainingDays(daysInMonth - startDate.Day);
-                price += Count190Price(startDate, endDate, discount);
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
-                if (bestPrice > price) bestPrice = price;
+                price += Count190Price(startDate, endDate, discount);
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190) });
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
                 price = Count190Price(startDate, endDate, discount);
-                price += CountForRemainingDays(daysDifference - 190 + startDate.Day);
-                
-                if (bestPrice > price) bestPrice = price;
+                tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190) });
 
-                price = CountForRemainingDays(daysDifference);
-                if (bestPrice > price) bestPrice = price;
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190));    
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
+
+                tarifItemsContainer = CountForRemainingDays(daysDifference, startDate);   
+                price = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+
+                if (bestPrice > price)
+                {
+                    bestTarifItems = tarifItems.ToList();
+                    bestPrice = price;
+                }
+                tarifItems.Clear();
 
             }
-            return bestPrice;
+
+            TarifItemsContainer container = new TarifItemsContainer();
+            container.tarifsItems = bestTarifItems.ToList();
+            container.price = bestPrice;
+
+            return container;
         }
 
 
 
 
         // metoda dopocita cenu pro zbyvajici pocet dnu (ikdyz je vetsi nez 123)
-        public static float CountForRemainingDays(int days)
+        public static TarifItemsContainer CountForRemainingDays(int days, DateTime startDate)
         {
             float price = 0;
-
+            DateTime tmpDate = startDate;
+            TarifItemsContainer container = new TarifItemsContainer();
+            
+            List<TarifItem> tarifItems = new List<TarifItem>();
+                    
             while (days > 0) {
                 if (days > NUMBER_OF_DAYS)
                 {
                     price += CountDaysPrice2(NUMBER_OF_DAYS, discount);
                     days -= NUMBER_OF_DAYS;
+                    tarifItems.Add(new TarifItem { days = NUMBER_OF_DAYS, dateStart = tmpDate, dateEnd = tmpDate.AddDays(NUMBER_OF_DAYS) });
+                    tmpDate = tmpDate.AddDays(NUMBER_OF_DAYS);
                 }
                 else
                 {
                     price += CountDaysPrice2(days, discount);
                     days = 0;
+                    tarifItems.Add(new TarifItem { days = days, dateStart = tmpDate, dateEnd = tmpDate.AddDays(days) });
                 }          
             }
 
+            container.tarifsItems = tarifItems.ToList();
+            container.price = price;
 
-            return price;
+            return container;
         }
 
 
