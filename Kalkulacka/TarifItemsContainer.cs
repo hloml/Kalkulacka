@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kalkulacka
 {
-    class TarifItemsContainer
+    public class TarifItemsContainer
     {
         public List<TarifItem> tarifsItems {get; set;}
 

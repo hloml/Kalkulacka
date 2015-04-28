@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 
 namespace Kalkulacka
 {
-    class Kalkulator
+    public class Kalkulator
     {
         private const int NUMBER_OF_DAYS = 123;
         private static Dictionary<String, List<Tarif>> tarifDictionary;
+        private const String EXCEL_NAME = "operational_tariff.xls";
 
         // testing parammeters for console
         static DateTime startDateG;
@@ -24,7 +25,7 @@ namespace Kalkulacka
 
         public static void Main(string[] args)
         {
-            String tariffPath = System.IO.Path.GetFullPath("..\\..\\operational_tariff.xls");
+            String tariffPath = System.IO.Path.GetFullPath("..\\..\\" + EXCEL_NAME);
             tarifDictionary = LoadExcel(tariffPath);
 
             startDateG = new DateTime(2015, 1, 1);
@@ -60,6 +61,14 @@ namespace Kalkulacka
             //    String countedTariff = CountTariff(startDateG, endDateG, discount);
 
             //}
+        }
+
+        public static void LoadExcelOnce()
+        {
+            if (tarifDictionary == null)
+            {
+                tarifDictionary = LoadExcel("C:\\Users\\Jara\\workspace\\git\\aswi2015-kalkulacka-a-doporuceni-jizdneho\\WebPovedCalculator\\" + EXCEL_NAME);
+            }
         }
 
 
@@ -316,7 +325,7 @@ namespace Kalkulacka
 
             Console.WriteLine("Nejlepsi cena je {0}", bestPrice);
             Console.WriteLine("");
-            return null;
+            return "" + bestPrice;
         }
 
 

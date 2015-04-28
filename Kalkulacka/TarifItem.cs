@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kalkulacka
 {
-    class TarifItem
+    public class TarifItem
     {
         public int days { get; set; }
         public DateTime dateStart { get; set; }

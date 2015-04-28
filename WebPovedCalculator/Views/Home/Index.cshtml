@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "Kalkulačka jízdného";
+}
+
+<h2>Kalkulátor ceny jízdného</h2>
+
+<hr />
+<form id="form1" class="form-horizontal">
+    <!-- Calculator head -->
+    <div class="form-group">
+        <label for="category" class="control-label col-xs-2">Kategorie</label>
+        <div class="col-xs-10">
+            <select id="category" name="category" size="1" class="form-control">
+                <option value="0">Sleva Žádná</option>
+                <option value="1">Sleva Malá</option>
+                <option value="2">Sleva Velká</option>
+                <option value="3">Sleva 100%</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <h4>Doba předplatného</h4>
+    </div>
+    <div class="form-group">
+        <label for="start_date" class="control-label col-xs-2">Od</label>
+        <div class="col-xs-10">
+            <input id="start_date" type="text" size="10" name="start_date" value="dneska" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="end_date" class="control-label col-xs-2">Do</label>
+        <div class="col-xs-10">
+            <input id="end_date" type="text" size="10" name="end_date" value="zejtra" class="form-control" />
+        </div>
+    </div>
+    <!-- Zones -->
+    <div class="col-xs-12">
+        <h4>Zóny</h4>
+    </div>
+    <div class="form-group">
+        <label for="zones_sum" class="control-label col-xs-2">Vnějších zón</label>
+        <div class="col-xs-10">
+            <select id="zones_sum" name="zones_sum" size="1" class="form-control">
+                <option value="0">Žádná</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-10">
+            <div class="checkbox">
+                <label><input id="pilsen" type="checkbox" name="pilsen" value="yes" /> Plzeň město</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-10">
+            <input type="submit" class="btn btn-primary" value="Spočítat cenu" />
+        </div>
+    </div>
+    <hr />
+    <div>
+        <h3>Cena: @ViewBag.Price</h3>
+    </div>
+</form>

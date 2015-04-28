@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kalkulacka
 {
-    class Tarif
+    public class Tarif
     {
         
         private const int NUMBER_OF_DAYS = 123;
