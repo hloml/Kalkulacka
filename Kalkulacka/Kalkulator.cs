@@ -345,7 +345,7 @@ namespace Kalkulacka
             {
                 price = Count190Price(startDate, endDate, discount);
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190)});
-                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190));   //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190), discount);   //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price += tarifItemsContainer.price;      
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -360,14 +360,14 @@ namespace Kalkulacka
 
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day))); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice      
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)), discount); // musime spocitat pocet dnu do startu mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice      
                 price = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 tmpDate = startDate.AddDays(190);
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = tmpDate });
                 price += Count190Price(startDate, endDate, discount);
-                tarifItemsContainer = CountForRemainingDays(daysDifference - 190, tmpDate);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190, tmpDate, discount);       //odecteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -387,7 +387,7 @@ namespace Kalkulacka
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate.AddDays(-startDate.Day), dateEnd = tmpDate });
                 tarifItems.Add(new TarifItem { days = 190, dateStart = tmpDate, dateEnd = tmpDate.AddDays(190) });
 
-                tarifItemsContainer = CountForRemainingDays(daysDifference - 380 + startDate.Day, startDate.AddDays(380));     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 380 + startDate.Day, startDate.AddDays(380), discount);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -399,7 +399,7 @@ namespace Kalkulacka
                 }
                 tarifItems.Clear();
 
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)), discount);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -407,8 +407,8 @@ namespace Kalkulacka
                 tmpDate = startDate.AddDays(190 + daysInMonth - startDate.Day);
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate.AddDays(daysInMonth - startDate.Day), dateEnd = tmpDate });
                 tarifItems.Add(new TarifItem { days = 190, dateStart = tmpDate, dateEnd = tmpDate.AddDays(190) });
-  
-                tarifItemsContainer = CountForRemainingDays(daysDifference - 380, tmpDate.AddDays(190));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 380, tmpDate.AddDays(190), discount);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -427,7 +427,7 @@ namespace Kalkulacka
 
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)));    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate.AddDays(-(daysInMonth - startDate.Day)), discount);    //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
                 price = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -444,7 +444,7 @@ namespace Kalkulacka
                 price = Count190Price(startDate, endDate, discount);
                 tarifItems.Add(new TarifItem { days = 190, dateStart = startDate, dateEnd = startDate.AddDays(190) });
 
-                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190));    
+                tarifItemsContainer = CountForRemainingDays(daysDifference - 190 + startDate.Day, startDate.AddDays(190), discount);    
                 price += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -456,7 +456,7 @@ namespace Kalkulacka
                 }
                 tarifItems.Clear();
 
-                tarifItemsContainer = CountForRemainingDays(daysDifference, startDate);   
+                tarifItemsContainer = CountForRemainingDays(daysDifference, startDate, discount);   
                 price = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -481,7 +481,7 @@ namespace Kalkulacka
 
 
         // metoda dopocita cenu pro zbyvajici pocet dnu (ikdyz je vetsi nez 123)
-        public static TarifItemsContainer CountForRemainingDays(int days, DateTime startDate)
+        public static TarifItemsContainer CountForRemainingDays(int days, DateTime startDate, String discount)
         {
             float price = 0;
             DateTime tmpDate = startDate;
