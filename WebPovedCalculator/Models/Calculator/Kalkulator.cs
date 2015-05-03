@@ -6,9 +6,10 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 
-namespace Kalkulacka
+namespace WebPovedCalculator.Models
 {
     public class Kalkulator
     {
@@ -18,62 +19,18 @@ namespace Kalkulacka
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
         private const String EXCEL_NAME = "operational_tariff.xls";
+        private static String EXCEL_PATH;
 
-        // testing parammeters for console
-        static DateTime startDateG;
-        static DateTime endDateG;
-        static String discount;
-        static String defaultZone = "vnejsi";
-
-
-        public static void Main(string[] args)
-        {
-            String tariffPath = System.IO.Path.GetFullPath("..\\..\\" + EXCEL_NAME);
-            tarifDictionary = LoadExcel(tariffPath);
-
-            startDateG = new DateTime(2015, 1, 1);
-            endDateG = new DateTime(2015, 6, 1);
-            discount = "plne";
-            CountTariff(startDateG, endDateG, discount);
-
-
-            endDateG = endDateG.AddDays(500);
-            startDateG = endDateG.AddDays(300);
-
-            startDateG = new DateTime(2015, 10, 25);
-            endDateG = new DateTime(2019, 6, 1);
-            discount = "plne";
-            CountTariff(startDateG, endDateG, discount);
+        static String defaultZone = "vnejsi"; //TODO
 
 
 
-            startDateG = new DateTime(2015, 10, 1);
-            endDateG = new DateTime(2016, 4, 1);
-            discount = "plne";
-            CountTariff(startDateG, endDateG, discount);
-
-
-            startDateG = new DateTime(2015, 9, 1);
-            endDateG = new DateTime(2016, 4, 1);
-            discount = "plne";
-            CountTariff(startDateG, endDateG, discount);
-
-            Console.ReadLine();
-            //Console.WriteLine("-Pocitani tarifu-");
-            //Console.WriteLine();
-            //while (true)
-            //{
-            //    InsertValues();
-            //    String countedTariff = CountTariff(startDateG, endDateG, discount);
-
-            //}
-        }
-
-        public static Dictionary<String, List<Tarif>> GetExcel(String path)
+        public static Dictionary<String, List<Tarif>> GetExcel()
         {
             if (tarifDictionary == null)
             {
-                tarifDictionary = LoadExcel(path + EXCEL_NAME);
+                EXCEL_PATH = HttpContext.Current.Server.MapPath("~/");
+                tarifDictionary = LoadExcel(EXCEL_PATH + EXCEL_NAME);
             }
             return tarifDictionary;
         }

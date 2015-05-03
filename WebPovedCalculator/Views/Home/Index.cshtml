@@ -1,72 +1,223 @@
-﻿
+﻿@model WebPovedCalculator.Models.CounterModel
+
 @{
-    ViewBag.Title = "Kalkulačka jízdného";
+    ViewBag.Title = "Index";
 }
 
-<h2>Kalkulátor ceny jízdného</h2>
+<h2>Index</h2>
 
-<hr />
-<form id="form1" class="form-horizontal">
-    <!-- Calculator head -->
-    <div class="form-group">
-        <label for="category" class="control-label col-xs-2">Kategorie</label>
-        <div class="col-xs-10">
-            <select id="category" name="category" size="1" class="form-control">
-                <option value="0">Sleva Žádná</option>
-                <option value="1">Sleva Malá</option>
-                <option value="2">Sleva Velká</option>
-                <option value="3">Sleva 100%</option>
-            </select>
+@using (Html.BeginForm())
+{
+    // Datepickers
+    <script>
+        $(function () {
+            $("#startDate").datepicker({
+                //changeMonth: true,
+                //changeYear: true,
+                dateFormat: "d.m.yy",
+                onClose: function (selectedDate) {
+                    $("#endDate").datepicker("option", "minDate", selectedDate);
+                }
+            });
+            
+        });
+        $(function () {
+            $("#endDate").datepicker({
+                //changeMonth: true,
+                //changeYear: true,
+                dateFormat: "d.m.yy",
+                onClose: function (selectedDate) {
+                    $("#startDate").datepicker("option", "maxDate", selectedDate);
+                }
+            });
+        });
+    </script>
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.ValidationSummary(true)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.category, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.category, new SelectList(Model.categories, "Value", "Text"), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.category)
+            </div>
         </div>
-    </div>
-    <div class="col-xs-12">
-        <h4>Doba předplatného</h4>
-    </div>
-    <div class="form-group">
-        <label for="start_date" class="control-label col-xs-2">Od</label>
-        <div class="col-xs-10">
-            <input id="start_date" type="text" size="10" name="start_date" value="dneska" class="form-control" />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.startDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.startDate, new { @class = "form-control jquery_datepicker", @Value = Model.startDate.ToShortDateString() })
+                @Html.ValidationMessageFor(model => model.startDate)
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="end_date" class="control-label col-xs-2">Do</label>
-        <div class="col-xs-10">
-            <input id="end_date" type="text" size="10" name="end_date" value="zejtra" class="form-control" />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.endDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.endDate, new { @class = "form-control jquery_datepicker", @Value = Model.endDate.ToShortDateString() })
+                @Html.ValidationMessageFor(model => model.endDate)
+            </div>
         </div>
-    </div>
-    <!-- Zones -->
-    <div class="col-xs-12">
-        <h4>Zóny</h4>
-    </div>
-    <div class="form-group">
-        <label for="zones_sum" class="control-label col-xs-2">Vnějších zón</label>
-        <div class="col-xs-10">
-            <select id="zones_sum" name="zones_sum" size="1" class="form-control">
-                <option value="0">Žádná</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-            </select>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.zone, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.zone, new SelectList(Model.zones, "Value", "Text"), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.zone)
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-10">
-            <div class="checkbox">
-                <label><input id="pilsen" type="checkbox" name="pilsen" value="yes" /> Plzeň město</label>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="checkbox">
+                    <label for="@Html.DisplayNameFor(model => model.innerZone)">
+                        @Html.CheckBoxFor(model => model.innerZone)
+                        @Html.DisplayNameFor(model => model.innerZoneName)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Spočítat cenu" class="btn btn-default" />
             </div>
         </div>
     </div>
-    <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-10">
-            <input type="submit" class="btn btn-primary" value="Spočítat cenu" />
-        </div>
-    </div>
+}
+
+
+@if (@Model.price > 0)
+{
+    // Sliders
+    <script>
+        $(function () {
+            $("#fuelConsumption").slider({
+                value: 8.5,
+                min: 1,
+                max: 20,
+                step: 0.1,
+                slide: function (event, ui) {
+                    $("#fuelConsumptionAmount").val(ui.value + " litr/100km");
+                    $("#fuelConsumptionValue").val(ui.value);
+                }
+            });
+            $("#fuelConsumptionAmount").val($("#fuelConsumption").slider("value") + " litr/100km");
+        });
+        //
+        $(function () {
+            $("#fuelPrice").slider({
+                value: 35,
+                min: 10,
+                max: 50,
+                step: 0.1,
+                slide: function (event, ui) {
+                    $("#fuelPriceAmount").val(ui.value + " Kč/litr");
+                }
+            });
+            $("#fuelPriceAmount").val($("#fuelPrice").slider("value") + " Kč/litr");
+        });
+        //
+        $(function () {
+            $("#pathDistance").slider({
+                value: 10,
+                min: 1,
+                max: 80,
+                step: 1,
+                slide: function (event, ui) {
+                    $("#pathDistanceAmount").val(ui.value + " Km");
+                }
+            });
+            $("#pathDistanceAmount").val($("#pathDistance").slider("value") + " Km");
+        });
+        //
+        $(function () {
+            $("#parkingPrice").slider({
+                value: 0,
+                min: 0,
+                max: 300,
+                step: 5,
+                slide: function (event, ui) {
+                    $("#parkingPriceAmount").val(ui.value + " Kč/den");
+                }
+            });
+            $("#parkingPriceAmount").val($("#parkingPrice").slider("value") + " Kč/den");
+        });
+    </script>
+    
+    <p style="font-size: 2em;">@Model.price Kč</p>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Typ tarifu</th><th>Cena</th></tr>
+        </thead>
+        <tbody>
+            @{
+                var denni = "denni";
+                var nedenni = "pulrocni/rocni";
+            }
+            @foreach (var item in Model.tarifs)
+            {
+                <tr><td>@item.dateStart</td><td>@item.dateEnd</td><td>@item.days</td><td>@if (@item.days < 190) {@denni}else{@nedenni}</td><td>???</td></tr>
+            }
+        </tbody>
+    </table>
     <hr />
-    <div>
-        <h3>Cena: @ViewBag.Price</h3>
+    
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <label for="fuelConsumptionAmount" class="control-label col-md-4">
+                Průměrná spotřeba paliva:
+                <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#f6931f; font-weight:bold;" size="12">
+            </label>
+            <div class="col-md-8">
+                <input type="hidden" name="fuelConsumptionValue" />
+                <div id="fuelConsumption" style="margin-top:10px"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fuelPriceAmount" class="control-label col-md-4">
+                Cena 1 litru paliva:
+                <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#f6931f; font-weight:bold;" size="12">
+            </label>
+            <div class="col-md-8">
+                <div id="fuelPrice" style="margin-top:10px"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="pathDistanceAmount" class="control-label col-md-4">
+                Délka trasy (tam i zpět):
+                <input type="text" id="pathDistanceAmount" readonly style="border:0; color:#f6931f; font-weight:bold;" size="12">
+            </label>
+            <div class="col-md-8">
+                <div id="pathDistance" style="margin-top:10px"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="parkingPriceAmount" class="control-label col-md-4">
+                Cena parkování:
+                <input type="text" id="parkingPriceAmount" readonly style="border:0; color:#f6931f; font-weight:bold;" size="12">
+            </label>
+            <div class="col-md-8">
+                <div id="parkingPrice" style="margin-top:10px"></div>
+            </div>
+        </div>
+
+
+
     </div>
-</form>
+    
+    
+}
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
