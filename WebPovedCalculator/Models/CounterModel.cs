@@ -40,6 +40,8 @@ namespace WebPovedCalculator.Models
 
         public List<TarifItem> tarifs { get; set; }
 
+        public int daysDifference { get; set; }
+
         public CounterModel()
         {
             Dictionary<String, List<Tarif>> excel = Kalkulator.GetExcel();
@@ -55,10 +57,10 @@ namespace WebPovedCalculator.Models
 
         public void GetPrice()
         {
-         TarifItemsContainer container = Kalkulator.CountTariff(startDate, endDate, category);
-         price = container.price;
-         tarifs = container.tarifsItems.ToList();
-
+            TarifItemsContainer container = Kalkulator.CountTariff(startDate, endDate, category);
+            price = container.price;
+            tarifs = container.tarifsItems.ToList();
+            daysDifference = Kalkulator.DaysDifference(startDate, endDate);
         }
 
         private void MakeCategories(){

@@ -65,7 +65,7 @@ namespace WebPovedCalculator.Models
             {
                 return 0;
             }
-            return 1 / TariffPriceOnKM / KilometerPriceDiff();
+            return 1 / (TariffPriceOnKM / KilometerPriceDiff());
         }
     }
 }
