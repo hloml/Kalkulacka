@@ -1,36 +1,57 @@
 ﻿@model WebPovedCalculator.Models.CounterModel
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Poved Kalkulátor tarifu";
 }
 
-<h2>Index</h2>
+<h2>Poved Kalkulátor tarifu</h2>
 
 @using (Html.BeginForm())
 {
     // Datepickers
     <script>
-        $(function () {
-            $("#startDate").datepicker({
-                //changeMonth: true,
-                //changeYear: true,
-                dateFormat: "d.m.yy",
-                onClose: function (selectedDate) {
-                    $("#endDate").datepicker("option", "minDate", selectedDate);
-                }
-            });
-            
+    $(function () {
+        $("#startDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: "d.m.yy",
+            yearRange: '@DateTime.Now.Year:@(@DateTime.Now.Year+10)',
+            onClose: function (selectedDate) {
+                $("#endDate").datepicker("option", "minDate", selectedDate);
+            }
         });
-        $(function () {
-            $("#endDate").datepicker({
-                //changeMonth: true,
-                //changeYear: true,
-                dateFormat: "d.m.yy",
-                onClose: function (selectedDate) {
-                    $("#startDate").datepicker("option", "maxDate", selectedDate);
-                }
-            });
+
+    });
+    $(function () {
+        $("#endDate").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: "d.m.yy",
+            yearRange: '@DateTime.Now.Year:@(@DateTime.Now.Year+10)',
+            onClose: function (selectedDate) {
+                $("#startDate").datepicker("option", "maxDate", selectedDate);
+            }
         });
+    });
+    $.datepicker.regional['cs'] = {
+        closeText: 'Zavřít',
+        prevText: '&#x3c;Dříve',
+        nextText: 'Později&#x3e;',
+        currentText: 'Nyní',
+        monthNames: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen',
+            'září', 'říjen', 'listopad', 'prosinec'],
+        monthNamesShort: ['led', 'úno', 'bře', 'dub', 'kvě', 'čer', 'čvc', 'srp', 'zář', 'říj', 'lis', 'pro'],
+        dayNames: ['neděle', 'pondělí', 'úterý', 'středa', 'čtvrtek', 'pátek', 'sobota'],
+        dayNamesShort: ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so'],
+        dayNamesMin: ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so'],
+        weekHeader: 'Týd',
+        dateFormat: 'dd/mm/yy',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: ''
+    };
+    $.datepicker.setDefaults($.datepicker.regional['cs']);
     </script>
     @Html.AntiForgeryToken()
     
@@ -215,6 +236,7 @@
     </script>
     
     <p style="font-size: 2em;">@Model.price Kč, @Model.daysDifference dní</p>
+    
     <table class="table table-striped">
         <thead>
             <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Typ tarifu</th><th>Cena</th></tr>
@@ -230,6 +252,9 @@
             }
         </tbody>
     </table>
+    <hr />
+
+    <h2>Srovnání nákladů: Auto X Veřejná doprava</h2>
     <hr />
     
     //Chosing car parameters
@@ -277,6 +302,8 @@
 
     </div>
 
+    <hr />
+    <h3>Srovnání auto x veřejná doprava </h3>
     <hr />
     
     //Car - public transport comparsion result
