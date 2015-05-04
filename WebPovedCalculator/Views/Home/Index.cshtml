@@ -114,9 +114,6 @@
                 step: 0.1,
                 slide: function (event, ui) {
                     $("#fuelConsumptionAmount").val(ui.value + " litr/100km");
-                    $("#fuelConsumptionValue").val(ui.value);
-                },
-                change: function (event, ui) {
                     AverageFuelConsumption = ui.value;
                     countAll();
                 }
@@ -133,8 +130,6 @@
                 step: 0.1,
                 slide: function (event, ui) {
                     $("#fuelPriceAmount").val(ui.value + " Kč/litr");
-                },
-                change: function (event, ui) {
                     LiterOfFuelPrice = ui.value;
                     countAll();
                 }
@@ -151,8 +146,6 @@
                 step: 1,
                 slide: function (event, ui) {
                     $("#pathDistanceAmount").val(ui.value + " Km");
-                },
-                change: function (event, ui) {
                     PathDistance = ui.value;
                     countAll();
                 }
@@ -169,8 +162,6 @@
                 step: 5,
                 slide: function (event, ui) {
                     $("#parkingPriceAmount").val(ui.value + " Kč/den");
-                },
-                change: function (event, ui) {
                     ParkingFee = ui.value;
                     countAll();
                 }
@@ -194,7 +185,7 @@
                 return CarPriceOnKM - TariffPriceOnKM;
             }
             function OnDistancePriceDiff() {
-                return KilometerPriceDiff() * PathDistance;
+                return KilometerPriceDiff() * PathDistance + ParkingFee;
             }
             function OnPrepaidTimePriceDiff() {
                 return OnDistancePriceDiff() * TariffLenght;
@@ -203,14 +194,23 @@
                 if (KilometerPriceDiff() == 0) {
                     return 0;
                 }
-                return 100 - (100 / (CarPriceOnKM / TariffPriceOnKM));
+                return 100 - (100 / (PriceOfPath() / (TariffPrice / TariffLenght)));
             }
             //results out
-            $("#ResultPriceOfPath").val(parseFloat(PriceOfPath()).toFixed(2));
-            $("#ResultKilometerPriceDiff").val(parseFloat(KilometerPriceDiff()).toFixed(2));
-            $("#ResultOnDistancePriceDiff").val(parseFloat(OnDistancePriceDiff()).toFixed(2));
-            $("#ResultOnPrepaidTimePriceDiff").val(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2));
-            $("#ResultPercentPriceDiff").val(parseFloat(PercentPriceDiff()).toFixed(2));
+            $("#ResultPriceOfPath").val(parseFloat(PriceOfPath()).toFixed(2) + " Kč");
+            $("#ResultKilometerPriceDiff").val(parseFloat(KilometerPriceDiff()).toFixed(2) + " Kč");
+            $("#ResultOnDistancePriceDiff").val(parseFloat(OnDistancePriceDiff()).toFixed(2) + " Kč");
+            $("#ResultOnPrepaidTimePriceDiff").val(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2) + " Kč");
+            $("#ResultPercentPriceDiff").val(parseFloat(PercentPriceDiff()).toFixed(2) + " %");
+
+            //change color
+            if(PercentPriceDiff() < 0) {
+                $(".has-success").removeClass("has-success").addClass("has-error");
+                $(".help-block").text("- prodělávám");
+            } else {
+                $(".has-error").removeClass("has-error").addClass("has-success");
+                $(".help-block").text("+ šetřím");
+            }
         }
     </script>
     
@@ -241,7 +241,6 @@
                 <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
-                <input type="hidden" name="fuelConsumptionValue" />
                 <div id="fuelConsumption" style="margin-top:12px"></div>
             </div>
         </div>
@@ -283,33 +282,38 @@
     //Car - public transport comparsion result
     <div class="form-horizontal">
         <div class="form-group">
-            <label class="control-label col-md-4" for="ResultPriceOfPath">Price of Path</label>
+            <label class="control-label col-md-4" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultPriceOfPath" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="ResultKilometerPriceDiff">Kilometer price difference</label>
+        <div></div>
+        <div class="form-group has-success">
+            <label class="control-label col-md-4" for="ResultKilometerPriceDiff">Při jízdě veřejnou dopravou na 1 km</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultKilometerPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <span class="help-block"></span>
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="ResultOnDistancePriceDiff">On distance price difference</label>
+        <div class="form-group has-success">
+            <label class="control-label col-md-4" for="ResultOnDistancePriceDiff">Při jízdě veřejnou dopravou za den</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultOnDistancePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <span class="help-block"></span>
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="ResultOnPrepaidTimePriceDiff">On prepaid time price difference</label>
+        <div class="form-group has-success">
+            <label class="control-label col-md-4" for="ResultOnPrepaidTimePriceDiff">Při jízdě veřejnou dopravou za předplacené období</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultOnPrepaidTimePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <span class="help-block"></span>
             </div>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-4" for="ResultPercentPriceDiff">Percent price difference</label>
+        <div class="form-group has-success">
+            <label class="control-label col-md-4" for="ResultPercentPriceDiff">Rozdíl v procentech</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultPercentPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <span class="help-block"></span>
             </div>
         </div>
 
