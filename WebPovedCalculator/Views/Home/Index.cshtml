@@ -69,7 +69,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Spočítat cenu" class="btn btn-default" />
+                <input type="submit" value="Spočítat cenu" class="btn btn-primary" />
             </div>
         </div>
     </div>
@@ -86,15 +86,22 @@
         });
     </script>
     
-    <p style="font-size: 2em;">@Model.price Kč, @Model.daysDifference dní</p>
-    
+    <hr />
+    <div class="form-group">
+            <h2>
+                <span class="label label-info">@Model.price Kč</span> <span class="label label-default">@Model.daysDifference dní</span>
+            </h2>
+    </div>
+
+
+
     <table class="table table-striped">
         <thead>
             <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Typ tarifu</th><th>Cena</th></tr>
         </thead>
         <tbody>
             @{
-                var denni = "denni";
+    var denni = "denni";
                 var nedenni = "pulrocni/rocni";
             }
             @foreach (var item in Model.tarifs)
@@ -104,8 +111,9 @@
         </tbody>
     </table>
     <hr />
+    <hr />
 
-    <h2>Srovnání nákladů: Auto X Veřejná doprava</h2>
+    <h3>Srovnání nákladů: Auto X Veřejná doprava</h3>
     <hr />
     
     //Chosing car parameters
@@ -123,7 +131,7 @@
 
         <div class="form-group">
             <label for="fuelPriceAmount" class="control-label col-md-4">
-                Cena 1 litru paliva:
+                Cena paliva:
                 <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
@@ -154,8 +162,6 @@
     </div>
 
     <hr />
-    <h3>Srovnání auto x veřejná doprava </h3>
-    <hr />
     
     //Car - public transport comparsion result
     <div class="form-horizontal">
@@ -165,33 +171,35 @@
                 <input class="form-control" type="text" id="ResultPriceOfPath" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
             </div>
         </div>
-        <div></div>
+        <hr />
         <div class="form-group has-success">
             <label class="control-label col-md-4" for="ResultKilometerPriceDiff">Při jízdě veřejnou dopravou na 1 km</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultKilometerPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-                <span class="help-block"></span>
             </div>
         </div>
         <div class="form-group has-success">
             <label class="control-label col-md-4" for="ResultOnDistancePriceDiff">Při jízdě veřejnou dopravou za den</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultOnDistancePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-                <span class="help-block"></span>
             </div>
         </div>
         <div class="form-group has-success">
             <label class="control-label col-md-4" for="ResultOnPrepaidTimePriceDiff">Při jízdě veřejnou dopravou za předplacené období</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultOnPrepaidTimePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-                <span class="help-block"></span>
             </div>
         </div>
         <div class="form-group has-success">
-            <label class="control-label col-md-4" for="ResultPercentPriceDiff">Rozdíl v procentech</label>
+            <label class="control-label col-md-4" for="ResultPercentPriceDiff">Při jízdě veřejnou dopravou v procentech</label>
             <div class="col-md-8">
                 <input class="form-control" type="text" id="ResultPercentPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-                <span class="help-block"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8" style="font-size:large">
+                    <span id="saving" class="label label-success">+ šetřím</span>
+                    <span id="loosing" class="label label-default">- prodělávám</span>
             </div>
         </div>
 
@@ -199,6 +207,7 @@
 
 
 }
+    <hr />    
 
     <div>
         @Html.ActionLink("Back to List", "Index")

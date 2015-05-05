@@ -111,10 +111,14 @@ function countAll() {
     // Change color and help-block text
     if (PercentPriceDiff() < 0) {
         $(".has-success").removeClass("has-success").addClass("has-error");
-        $(".help-block").text("- prodělávám");
+        //$(".help-block").text("- prodělávám");
+        $("#saving").removeClass("label-success").addClass("label-default");
+        $("#loosing").removeClass("label-default").addClass("label-danger");
     } else {
         $(".has-error").removeClass("has-error").addClass("has-success");
-        $(".help-block").text("+ šetřím");
+        //$(".help-block").text("+ šetřím");
+        $("#saving").removeClass("label-default").addClass("label-success");
+        $("#loosing").removeClass("label-danger").addClass("label-default");
     }
 }
 
