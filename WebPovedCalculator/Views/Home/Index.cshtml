@@ -248,7 +248,7 @@
             }
             @foreach (var item in Model.tarifs)
             {
-                <tr><td>@item.dateStart</td><td>@item.dateEnd</td><td>@item.days</td><td>@if (@item.days < 190) {@denni}else{@nedenni}</td><td>???</td></tr>
+                <tr><td>@item.dateStart</td><td>@item.dateEnd</td><td>@item.days</td><td>@if (@item.days < 190) {@denni}else{@nedenni}</td><td>@item.price</td></tr>
             }
         </tbody>
     </table>
