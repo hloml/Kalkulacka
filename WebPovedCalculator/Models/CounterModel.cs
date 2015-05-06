@@ -57,7 +57,21 @@ namespace WebPovedCalculator.Models
 
         public void GetPrice()
         {
-            TarifItemsContainer container = Kalkulator.CountTariff(startDate, endDate, category);
+            TarifItemsContainer container;
+
+
+            switch (Kalkulator.getCountingMethod(category))
+            {
+                case 1:
+                    container = Kalkulator.CountTariff(startDate, endDate, category);
+                    break;
+                case 2:
+                    container = Kalkulator.CountTariffForStudents(startDate, endDate, category);
+                    break;
+                default:
+                    return;
+            }
+
             price = container.price;
             tarifs = container.tarifsItems.ToList();
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
