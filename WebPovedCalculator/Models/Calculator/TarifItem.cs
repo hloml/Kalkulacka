@@ -13,5 +13,6 @@ namespace WebPovedCalculator.Models
 
         public DateTime dateEnd { get; set; }
 
+        public float price { get; set; }
     }
 }

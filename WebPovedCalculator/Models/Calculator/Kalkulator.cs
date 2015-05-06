@@ -16,6 +16,8 @@ namespace WebPovedCalculator.Models
         private const int NUMBER_OF_DAYS = 123;
         private const int HALF_YEAR = 190;
         private const int ONE_YEAR = 380;
+        private const int ONE_MONTH = 30;
+        private const int TEN_MONTHS = 300;
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
         private const String EXCEL_NAME = "operational_tariff.xls";
@@ -219,11 +221,13 @@ namespace WebPovedCalculator.Models
                 tmpDate = new DateTime(startDate.Year + 1, 1, 1);
                 for (int i = 1; i < yearsDifference - 1; i++)
                 {
-                    tarifItems.Add(new TarifItem { days = ONE_YEAR, dateStart = tmpDate, dateEnd = new DateTime(tmpDate.Year, 12, 31) });
+                    tarifItems.Add(new TarifItem { days = ONE_YEAR, dateStart = tmpDate, dateEnd = tmpDate.AddDays(ONE_YEAR) });
                     tmpDate = tmpDate.AddYears(1);
                 }
 
-                tarifItemsContainer = bestPriceForYear(new DateTime(endDate.Year, 1, 1), endDate, discount, true);
+                tmpDate = tmpDate.AddDays(-1).AddDays(ONE_YEAR);
+
+                tarifItemsContainer = bestPriceForYear(tmpDate, endDate, discount, true);
                 price += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -618,6 +622,146 @@ namespace WebPovedCalculator.Models
 
 
 
+
+        public static TarifItemsContainer CountTariffForStudents(DateTime startDate, DateTime endDate, String discount)
+        {
+            float price = 0;
+
+            List<TarifItem> tarifItems = new List<TarifItem>();
+
+ 
+            DateTime tmpDate = startDate;
+            TarifItemsContainer tarifItemsContainer = new TarifItemsContainer();
+            DateTime tmp;
+
+
+            do
+            {
+                tmp = MakeDatetimeToHolidays(tmpDate, endDate);
+                tarifItemsContainer = CountForSchoolYear(tmpDate, tmp, discount);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                price += tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+                tmpDate = tmp;
+
+                if (DateTime.Compare(tmpDate, endDate) < 0)      // spocteme pro prazdniny
+                {
+                    tmp = MakeDatetimeForHolidays(tmpDate, endDate);
+                    tarifItemsContainer = CountForHoliday(tmpDate.AddDays(1), tmp, discount);
+                    price += tarifItemsContainer.price;
+                    tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+                    tmpDate = tmp.AddDays(1);
+                }
+            } while (DateTime.Compare(tmpDate, endDate) < 0);
+           
+            tarifItemsContainer.price = price;
+            tarifItemsContainer.tarifsItems = tarifItems.ToList();
+
+            return tarifItemsContainer;
+        }
+
+
+        static DateTime MakeDatetimeToHolidays(DateTime startDate, DateTime endDate)
+        {
+            DateTime tmpDate = new DateTime(startDate.Year, 6, 30);
+
+            if (DateTime.Compare(tmpDate, startDate) <= 0 )
+            {
+                tmpDate = tmpDate.AddYears(1);
+            }
+
+            if (DateTime.Compare(tmpDate, endDate) > 0)
+            {
+                tmpDate = endDate;
+            }
+
+            return tmpDate;
+        }
+
+
+
+        static DateTime MakeDatetimeForHolidays(DateTime startDate, DateTime endDate)
+        {
+            DateTime tmpDate = new DateTime(startDate.Year, 8, 31);
+
+            if (DateTime.Compare(tmpDate, endDate) > 0)
+            {
+                tmpDate = endDate;
+            }
+            return tmpDate;
+        }
+
+
+
+
+
+        static TarifItemsContainer CountForHoliday(DateTime startDate, DateTime endDate, String discount)
+        {
+            TarifItemsContainer tarifItemsContainer;
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(startDate, endDate) - 1, startDate, discount);
+            return tarifItemsContainer;
+        }
+
+        static TarifItemsContainer CountForSchoolYear(DateTime startDate, DateTime endDate, String discount)
+        {
+            DateTime tmpDate = startDate;
+            List<TarifItem> bestTarifItems = new List<TarifItem>();
+            List<TarifItem> tarifItems = new List<TarifItem>();
+            TarifItemsContainer tarifItemsContainer;
+            float price;
+            float totalPrice;
+            float bestPrice = float.MaxValue;
+
+            price = Get10MonthsPrice(discount);
+            tarifItems.Add(new TarifItem { days = TEN_MONTHS, dateStart = new DateTime(startDate.Year, 9, 1), dateEnd = new DateTime(startDate.Year + 1, 6, 30), price = price });
+            totalPrice = price;
+           
+            if (bestPrice > totalPrice)
+            {
+                bestTarifItems = tarifItems.ToList();
+                bestPrice = totalPrice;
+            }
+            tarifItems.Clear();
+            totalPrice = 0;
+
+            if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // algoritmus je pro vice nez 1 mesic
+            {
+                price = GetMonthPrice(discount);
+                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, discount);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                totalPrice = tarifItemsContainer.price;
+                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+                tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
+
+                while (tmpDate.Year != endDate.Year || tmpDate.Month != endDate.Month)
+                {    // pro kazdy mesic mezi
+                    tarifItems.Add(new TarifItem { days = ONE_MONTH, dateStart = tmpDate, dateEnd = tmpDate.AddMonths(1), price = price });
+                    totalPrice += price;
+                    tmpDate = tmpDate.AddMonths(1);
+                }
+
+            }
+
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate), tmpDate, discount);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+            totalPrice += tarifItemsContainer.price;
+            tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+            
+            if (bestPrice > totalPrice)
+            {
+                bestTarifItems = tarifItems.ToList();
+                bestPrice = totalPrice;
+            }
+            tarifItems.Clear();
+
+
+            tarifItemsContainer.price = bestPrice;
+            tarifItemsContainer.tarifsItems = bestTarifItems.ToList();
+
+            return tarifItemsContainer;
+        }
+
+
+
         // count price for year tariff
         public static float Count380Price(DateTime startDate, DateTime endDate, String discount)
         {
@@ -646,6 +790,36 @@ namespace WebPovedCalculator.Models
             if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return -3; // error in string to int
             return oneSixMonthsPrice;
         }
+
+
+        public static float Get10MonthsPrice(String discount)
+        {
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // discount not found
+
+            int price;
+            String priceString;
+            if (!choosenTariff.Dictionary.TryGetValue("10 měsíční", out priceString)) return -2; // half-year prepay not found
+
+            if (!Int32.TryParse(priceString, out price)) return -3; // error in string to int
+            return price;
+        }
+
+        public static float GetMonthPrice(String discount)
+        {
+            Tarif choosenTariff = TariffChooser(discount);
+            if (choosenTariff == null) return -1; // discount not found
+
+            int price;
+            String priceString;
+            if (!choosenTariff.Dictionary.TryGetValue("měsíční", out priceString)) return -2; // half-year prepay not found
+
+            if (!Int32.TryParse(priceString, out price)) return -3; // error in string to int
+            return price;
+        }
+
+
+
 
         // counts day difference between start and end date
         public static int DaysDifference(DateTime startDate, DateTime endDate)
