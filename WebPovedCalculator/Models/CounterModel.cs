@@ -29,7 +29,7 @@ namespace WebPovedCalculator.Models
         public List<SelectListItem> categories { get; set; }
 
         [Display(Name = "Vnějších zón")]
-        public String zone { get; set; }
+        public int zone { get; set; }
 
         public List<SelectListItem> zones { get; set; }
 
@@ -60,6 +60,7 @@ namespace WebPovedCalculator.Models
             TarifItemsContainer container;
 
 
+
             switch (Kalkulator.getCountingMethod(category))
             {
                 case 1:
@@ -75,6 +76,21 @@ namespace WebPovedCalculator.Models
             price = container.price;
             tarifs = container.tarifsItems.ToList();
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
+
+            // TODO - number of zones
+            int numberOfZones = zone;
+            if (innerZone)
+            {
+                numberOfZones++;
+            }
+            if ((numberOfZones * price) < Kalkulator.GetNetworkFare(category))
+            {
+                price = numberOfZones * price;
+            }
+            else
+            {
+                price = Kalkulator.GetNetworkFare(category);
+            }
         }
 
         private void MakeCategories(){

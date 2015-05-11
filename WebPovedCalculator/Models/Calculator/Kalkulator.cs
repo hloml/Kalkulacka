@@ -195,7 +195,10 @@ namespace WebPovedCalculator.Models
             return tarifs;
         }
 
-
+        public static int GetNetworkFare(String discount){
+            //TODO
+            return Int32.MaxValue;
+        }
 
         // counts prices for day, year and half-year tariffs
         public static TarifItemsContainer CountTariff(DateTime startDate, DateTime endDate, String discount)

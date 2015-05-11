@@ -89,7 +89,10 @@
     <hr />
     <div class="form-group">
             <h2>
-                <span class="label label-info">@Model.price Kč</span> <span class="label label-default">@Model.daysDifference dní</span>
+                <span class="label label-info">@Model.price Kč</span>
+                <span class="label label-default">@Model.daysDifference dní</span>
+                <span class="label label-default">@Model.zone zon</span>
+                <span class="label label-default">@Model.innerZone vnitrni</span>
             </h2>
     </div>
 
@@ -106,7 +109,20 @@
             }
             @foreach (var item in Model.tarifs)
             {
-                <tr><td>@item.dateStart.ToShortDateString()</td><td>@item.dateEnd.ToShortDateString()</td><td>@item.days</td><td>@if (@item.days < 190) {@denni} else {@nedenni}</td><td>@item.price</td></tr>
+                <tr>
+                    <td>@item.dateStart.ToShortDateString()</td>
+                    <td>@item.dateEnd.ToShortDateString()</td>
+                    <td>@item.days</td>
+                    <td>@if (@item.days < 190) { @denni } else { @nedenni }</td>
+                    <td>
+                        @if (@Model.innerZone) { @item.innerPrice }
+                        @if (@Model.innerZone && (@Model.zone > 0)) { @(" + "); }
+                        @if (@Model.zone > 0) {
+                            if (@Model.zone > 1) { @Model.zone @(" x "); }
+                            @item.price
+                        }
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
