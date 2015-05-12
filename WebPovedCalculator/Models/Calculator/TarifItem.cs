@@ -16,7 +16,5 @@ namespace WebPovedCalculator.Models
 
         public float price { get; set; }
 
-        public float innerPrice { get; set; }
-
     }
 }

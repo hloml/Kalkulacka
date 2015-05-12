@@ -59,15 +59,18 @@ namespace WebPovedCalculator.Models
         {
             TarifItemsContainer container;
 
+            String defzone = "vnejsi"; //TODO
+            String inzone = "vnitrni"; //TODO
 
 
-            switch (Kalkulator.getCountingMethod(category))
+
+            switch (Kalkulator.getCountingMethod(category, defzone))
             {
                 case 1:
-                    container = Kalkulator.CountTariff(startDate, endDate, category);
+                    container = Kalkulator.CountTariff(startDate, endDate, category, defzone);
                     break;
                 case 2:
-                    container = Kalkulator.CountTariffForStudents(startDate, endDate, category);
+                    container = Kalkulator.CountTariffForStudents(startDate, endDate, category, defzone);
                     break;
                 default:
                     return;

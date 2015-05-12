@@ -115,10 +115,10 @@
                     <td>@item.days</td>
                     <td>@if (@item.days < 190) { @denni } else { @nedenni }</td>
                     <td>
-                        @if (@Model.innerZone) { @item.innerPrice }
-                        @if (@Model.innerZone && (@Model.zone > 0)) { @(" + "); }
+                        @if (@Model.innerZone) { @("XXX"); } @*@if (@Model.innerZone) { @item.innerPrice }*@
+                        @if (@Model.innerZone && (@Model.zone > 0)) { <span class="text-muted"> + </span> }
                         @if (@Model.zone > 0) {
-                            if (@Model.zone > 1) { @Model.zone @(" x "); }
+                            if (@Model.zone > 1) { <span class="text-muted">@Model.zone x </span> }
                             @item.price
                         }
                     </td>
