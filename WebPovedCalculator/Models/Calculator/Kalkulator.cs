@@ -19,8 +19,13 @@ namespace WebPovedCalculator.Models
         private const int ONE_MONTH = 30;
         private const int TEN_MONTHS = 300;
 
+        // zones names
+        public const String INNER_ZONE_NAME = "předplatné zóna 001 Plzeň";
+        public const String OUTER_ZONE_NAME = "předplatné - vnější zóny";
+        public const String NETWORK_ZONE_NAME = "síťové jízdné";
+
         private static Dictionary<String, List<Tarif>> tarifDictionary;
-        private const String EXCEL_NAME = "operational_tariff.xls";
+        private const String EXCEL_NAME = "operational_tariff_v2.xls";
         private static String EXCEL_PATH;
 
         //static String defaultZone = "vnejsi"; //TODO
@@ -193,11 +198,6 @@ namespace WebPovedCalculator.Models
             }
 
             return tarifs;
-        }
-
-        public static int GetNetworkFare(String discount){
-            //TODO
-            return Int32.MaxValue;
         }
 
         // counts prices for day, year and half-year tariffs

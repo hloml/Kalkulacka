@@ -57,47 +57,47 @@ namespace WebPovedCalculator.Models
 
         public void GetPrice()
         {
-            TarifItemsContainer container;
+            TarifItemsContainer containerInnerZone;
+            TarifItemsContainer containerOuterZone;
+            TarifItemsContainer containerNetworkZone;
 
-            String defzone = "vnejsi"; //TODO
-            String inzone = "vnitrni"; //TODO
-
-
-
-            switch (Kalkulator.getCountingMethod(category, defzone))
+            switch (Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME))
             {
                 case 1:
-                    container = Kalkulator.CountTariff(startDate, endDate, category, defzone);
+                    containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
+                    containerOuterZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
+                    containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
+                    if ((((innerZone?1:0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price)
+                    {
+                        price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
+                        tarifs = containerOuterZone.tarifsItems.ToList();
+                        //TODO
+                    }
+                    else
+                    {
+                        price = containerNetworkZone.price;
+                        tarifs = containerNetworkZone.tarifsItems.ToList();
+                        //TODO
+                    }
                     break;
                 case 2:
-                    container = Kalkulator.CountTariffForStudents(startDate, endDate, category, defzone);
+                    containerInnerZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
+                    containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
+                    price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
+                    tarifs = containerOuterZone.tarifsItems.ToList();
                     break;
                 default:
                     return;
             }
 
-            price = container.price;
-            tarifs = container.tarifsItems.ToList();
+            //price = container.price;
+            //tarifs = container.tarifsItems.ToList();
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
 
-            // TODO - number of zones
-            int numberOfZones = zone;
-            if (innerZone)
-            {
-                numberOfZones++;
-            }
-            if ((numberOfZones * price) < Kalkulator.GetNetworkFare(category))
-            {
-                price = numberOfZones * price;
-            }
-            else
-            {
-                price = Kalkulator.GetNetworkFare(category);
-            }
         }
 
         private void MakeCategories(){
-            List<Tarif> listTariff = Kalkulator.ListTariff("vnejsi"); // TODO
+            List<Tarif> listTariff = Kalkulator.ListTariff(Kalkulator.OUTER_ZONE_NAME);
             categories = new List<SelectListItem>();
             if (listTariff == null)
             {
