@@ -16,5 +16,7 @@ namespace WebPovedCalculator.Models
 
         public float price { get; set; }
 
+        public String TariffName { get; set; }
+
     }
 }

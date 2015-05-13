@@ -739,7 +739,7 @@ namespace WebPovedCalculator.Models
 
             int oneYearPrice;
             String yearsPriceString;
-            if (!choosenTariff.Dictionary.TryGetValue("380 dni", out yearsPriceString)) return -2; // year prepay not found
+            if (!choosenTariff.Dictionary.TryGetValue("" + ONE_YEAR, out yearsPriceString)) return -2; // year prepay not found
 
             if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return float.MaxValue; // error in string to int
       
@@ -754,7 +754,7 @@ namespace WebPovedCalculator.Models
 
             int oneSixMonthsPrice;
             String sixMonthsPriceString;
-            if (!choosenTariff.Dictionary.TryGetValue("190 dni", out sixMonthsPriceString)) return -2; // half-year prepay not found
+            if (!choosenTariff.Dictionary.TryGetValue("" + HALF_YEAR, out sixMonthsPriceString)) return -2; // half-year prepay not found
 
             if (!Int32.TryParse(sixMonthsPriceString, out oneSixMonthsPrice)) return float.MaxValue; // error in string to int
             return oneSixMonthsPrice;
@@ -768,7 +768,7 @@ namespace WebPovedCalculator.Models
 
             int price;
             String priceString;
-            if (!choosenTariff.Dictionary.TryGetValue("10 měsíční", out priceString)) return -2; // half-year prepay not found
+            if (!choosenTariff.Dictionary.TryGetValue("10 měsíční", out priceString)) return -2; // 10 months prepay not found
 
             if (!Int32.TryParse(priceString, out price)) return float.MaxValue; // error in string to int
             return price;
@@ -781,7 +781,7 @@ namespace WebPovedCalculator.Models
 
             int price;
             String priceString;
-            if (!choosenTariff.Dictionary.TryGetValue("měsíční", out priceString)) return -2; // half-year prepay not found
+            if (!choosenTariff.Dictionary.TryGetValue("měsíční", out priceString)) return -2; // monts prepay not found
 
             if (!Int32.TryParse(priceString, out price)) return float.MaxValue; // error in string to int
             return price;

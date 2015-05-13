@@ -57,11 +57,11 @@
         </div>
 
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
+            @Html.LabelFor(model => model.innerZone, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
                 <div class="checkbox">
-                    <label for="@Html.DisplayNameFor(model => model.innerZone)">
+                    <label>
                         @Html.CheckBoxFor(model => model.innerZone)
-                        @Html.DisplayNameFor(model => model.innerZoneName)
                     </label>
                 </div>
             </div>
@@ -87,26 +87,18 @@
     </script>
     
     <hr />
-    <div class="form-group">
-            <h2>
-                <span class="label label-info">@Model.price Kč</span>
-                <span class="label label-default">@Model.daysDifference dní</span>
-                <span class="label label-default">@Model.zone zon</span>
-                <span class="label label-default">@Model.innerZone vnitrni</span>
-            </h2>
-    </div>
 
-
-
+    var denni = "denni";
+    var nedenni = "pulrocni/rocni";
+    
+    if (@Model.isNetwork || @Model.zone > 0) {
+    if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Vnější zóna</h4> }
     <table class="table table-striped">
         <thead>
             <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Typ tarifu</th><th>Cena</th></tr>
         </thead>
         <tbody>
-            @{
-    var denni = "denni";
-                var nedenni = "pulrocni/rocni";
-            }
+            
             @foreach (var item in Model.tarifs)
             {
                 <tr>
@@ -115,10 +107,8 @@
                     <td>@item.days</td>
                     <td>@if (@item.days < 190) { @denni } else { @nedenni }</td>
                     <td>
-                        @if (@Model.innerZone) { @("XXX"); } @*@if (@Model.innerZone) { @item.innerPrice }*@
-                        @if (@Model.innerZone && (@Model.zone > 0)) { <span class="text-muted"> + </span> }
                         @if (@Model.zone > 0) {
-                            if (@Model.zone > 1) { <span class="text-muted">@Model.zone x </span> }
+                            if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
                             @item.price
                         }
                     </td>
@@ -126,6 +116,55 @@
             }
         </tbody>
     </table>
+    }
+    <hr />
+    if (!@Model.isNetwork && @Model.innerZone) {
+    <h4>Vnitřní zóna</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Typ tarifu</th><th>Cena</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.tarifsInner)
+            {
+                <tr>
+                    <td>@item.dateStart.ToShortDateString()</td>
+                    <td>@item.dateEnd.ToShortDateString()</td>
+                    <td>@item.days</td>
+                    <td>@if (@item.days < 190)
+                    { @denni }
+                    else
+                    { @nedenni }</td>
+                    <td>
+                        @item.price
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }
+
+    <div class="form-group">
+        <h3>
+            <span class="label label-default">Doba: @Model.daysDifference dní</span>
+            
+            @if (@Model.zone > 0)
+            {
+                <span class="label label-default">@Html.DisplayNameFor(model => model.zone): @Model.zone</span>
+            }
+            @if (@Model.innerZone)
+            {
+                <span class="label label-default">@Html.DisplayNameFor(model => model.innerZone)</span>
+            }
+            @if (@Model.isNetwork)
+            {
+                <span class="label label-warning">Síťové jízdné</span>
+            }
+        </h3>
+        <h2>
+            <span class="label label-info">Celková cena: @Model.price Kč</span>
+        </h2>
+    </div>
     <hr />
     <hr />
 
@@ -182,38 +221,49 @@
     //Car - public transport comparsion result
     <div class="form-horizontal">
         <div class="form-group">
-            <label class="control-label col-md-4" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>
-            <div class="col-md-8">
-                <input class="form-control" type="text" id="ResultPriceOfPath" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-            </div>
-        </div>
-        <hr />
-        <div class="form-group has-success">
-            <label class="control-label col-md-4" for="ResultKilometerPriceDiff">Při jízdě veřejnou dopravou na 1 km</label>
-            <div class="col-md-8">
-                <input class="form-control" type="text" id="ResultKilometerPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-            </div>
-        </div>
-        <div class="form-group has-success">
-            <label class="control-label col-md-4" for="ResultOnDistancePriceDiff">Při jízdě veřejnou dopravou za den</label>
-            <div class="col-md-8">
-                <input class="form-control" type="text" id="ResultOnDistancePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-            </div>
-        </div>
-        <div class="form-group has-success">
-            <label class="control-label col-md-4" for="ResultOnPrepaidTimePriceDiff">Při jízdě veřejnou dopravou za předplacené období</label>
-            <div class="col-md-8">
-                <input class="form-control" type="text" id="ResultOnPrepaidTimePriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
-            </div>
-        </div>
-        <div class="form-group has-success">
-            <label class="control-label col-md-4" for="ResultPercentPriceDiff">Při jízdě veřejnou dopravou v procentech</label>
-            <div class="col-md-8">
-                <input class="form-control" type="text" id="ResultPercentPriceDiff" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+            <label class="control-label col-md-6" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>
+            <div class="col-md-6">
+                <span class="lead">
+                    <span class="text-info" id="ResultPriceOfPath"></span>
+                </span>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-offset-4 col-md-8" style="font-size:large">
+            <label class="control-label col-md-6" for="ResultKilometerPriceDiff">
+                <span class="label saving-loosing"></span>
+                Při jízdě veřejnou dopravou na 1 km
+            </label>
+            <div class="col-md-6">
+                <span class="lead">
+                    <span class="text-success" id="ResultKilometerPriceDiff"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-6" for="ResultOnDistancePriceDiff">
+                <span class="label saving-loosing"></span>
+                Při jízdě veřejnou dopravou za den
+            </label>
+            <div class="col-md-6">
+                <span class="lead">
+                    <span class="text-success" id="ResultOnDistancePriceDiff"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-6" for="ResultOnPrepaidTimePriceDiff">
+                <span class="label saving-loosing"></span>
+                Při jízdě veřejnou dopravou za předplacené období
+            </label>
+            <div class="col-md-6">
+                <span class="lead">
+                    <span class="text-success" id="ResultOnPrepaidTimePriceDiff"></span>
+                    <span id="smile"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-6 col-md-6" style="font-size:large">
                     <span id="saving" class="label label-success">+ šetřím</span>
                     <span id="loosing" class="label label-default">- prodělávám</span>
             </div>

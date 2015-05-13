@@ -102,23 +102,27 @@ function countAll() {
     }
 
     // Results out
-    $("#ResultPriceOfPath").val(parseFloat(PriceOfPath()).toFixed(2) + " Kč");
-    $("#ResultKilometerPriceDiff").val(parseFloat(KilometerPriceDiff()).toFixed(2) + " Kč");
-    $("#ResultOnDistancePriceDiff").val(parseFloat(OnDistancePriceDiff()).toFixed(2) + " Kč");
-    $("#ResultOnPrepaidTimePriceDiff").val(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2) + " Kč");
-    $("#ResultPercentPriceDiff").val(parseFloat(PercentPriceDiff()).toFixed(2) + " %");
+    $("#ResultPriceOfPath").text(parseFloat(PriceOfPath()).toFixed(2) + " Kč");
+    $("#ResultKilometerPriceDiff").text(parseFloat(KilometerPriceDiff()).toFixed(2) + " Kč");
+    $("#ResultOnDistancePriceDiff").text(parseFloat(OnDistancePriceDiff()).toFixed(2) + " Kč");
+    $("#ResultOnPrepaidTimePriceDiff").text(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2) + " Kč");
+    //$("#ResultPercentPriceDiff").text(parseFloat(PercentPriceDiff()).toFixed(2) + " %");
 
     // Change color and help-block text
     if (PercentPriceDiff() < 0) {
-        $(".has-success").removeClass("has-success").addClass("has-error");
         //$(".help-block").text("- prodělávám");
         $("#saving").removeClass("label-success").addClass("label-default");
         $("#loosing").removeClass("label-default").addClass("label-danger");
+        $(".text-success").removeClass("text-success").addClass("text-danger");
+        $(".saving-loosing").text("Prodělávám").removeClass("label-success").addClass("label-danger");
+        $("#smile").removeClass("glyphicon glyphicon-thumbs-up");
     } else {
-        $(".has-error").removeClass("has-error").addClass("has-success");
         //$(".help-block").text("+ šetřím");
         $("#saving").removeClass("label-default").addClass("label-success");
         $("#loosing").removeClass("label-danger").addClass("label-default");
+        $(".text-danger").removeClass("text-danger").addClass("text-success");
+        $(".saving-loosing").text("Šetřím").removeClass("label-danger").addClass("label-success");
+        $("#smile").addClass("glyphicon glyphicon-thumbs-up");
     }
 }
 

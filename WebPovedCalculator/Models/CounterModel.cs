@@ -33,12 +33,14 @@ namespace WebPovedCalculator.Models
 
         public List<SelectListItem> zones { get; set; }
 
-        [Display(Name = "Plzeň město")]
-        public String innerZoneName { get; set; }
-
+        [Display(Name = "Zóna 001 Plzeň")]
         public Boolean innerZone { get; set; }
 
         public List<TarifItem> tarifs { get; set; }
+
+        public List<TarifItem> tarifsInner { get; set; }
+
+        public Boolean isNetwork { get; set; }
 
         public int daysDifference { get; set; }
 
@@ -60,6 +62,7 @@ namespace WebPovedCalculator.Models
             TarifItemsContainer containerInnerZone;
             TarifItemsContainer containerOuterZone;
             TarifItemsContainer containerNetworkZone;
+            isNetwork = false;
 
             switch (Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME))
             {
@@ -67,31 +70,34 @@ namespace WebPovedCalculator.Models
                     containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
                     containerOuterZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
                     containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
-                    if ((((innerZone?1:0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price)
+
+                    if ((((innerZone?1:0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
+                        || (containerNetworkZone.price < 0)) //network zone doesnt contain category
                     {
                         price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
                         tarifs = containerOuterZone.tarifsItems.ToList();
-                        //TODO
+                        //TODO ?
                     }
                     else
                     {
                         price = containerNetworkZone.price;
                         tarifs = containerNetworkZone.tarifsItems.ToList();
-                        //TODO
+                        isNetwork = true;
+                        //TODO ?
                     }
+                    tarifsInner = containerInnerZone.tarifsItems.ToList();
                     break;
                 case 2:
-                    containerInnerZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
+                    containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
                     containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
                     price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
+                    tarifsInner = containerInnerZone.tarifsItems.ToList();
                     tarifs = containerOuterZone.tarifsItems.ToList();
                     break;
                 default:
                     return;
             }
 
-            //price = container.price;
-            //tarifs = container.tarifsItems.ToList();
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
 
         }
