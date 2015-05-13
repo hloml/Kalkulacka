@@ -36,6 +36,10 @@ namespace WebPovedCalculator.Models
         [Display(Name = "Zóna 001 Plzeň")]
         public Boolean innerZone { get; set; }
 
+
+        [Display(Name = "ISIC")]
+        public Boolean discountISIC { get; set; }
+
         public List<TarifItem> tarifs { get; set; }
 
         public List<TarifItem> tarifsInner { get; set; }
@@ -89,7 +93,7 @@ namespace WebPovedCalculator.Models
                     break;
                 case 2:
                     containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
-                    containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
+                    containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME, discountISIC);
                     price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
                     tarifsInner = containerInnerZone.tarifsItems.ToList();
                     tarifs = containerOuterZone.tarifsItems.ToList();

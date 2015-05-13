@@ -18,5 +18,6 @@ namespace WebPovedCalculator.Models
 
         public String TariffName { get; set; }
 
+        public String category { get; set; }
     }
 }
