@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace WebPovedCalculator.Models
 {
+
+    /// <summary>
+    /// Store informations about chossen tariff
+    /// when tariff starts and end, his price and number of days for its
+    /// tariffName for his identification and category
+    /// </summary>
     public class TarifItem
     {
         public int days { get; set; }

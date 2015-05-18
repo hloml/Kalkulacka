@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace WebPovedCalculator.Models
 {
+    /// <summary>
+    /// For storing informations about tariff for category
+    /// Tariff always have values for 1..123 days
+    /// and some specific like 380, 190 which are stored in dictionary
+    /// </summary>
     public class Tarif
     {
         
