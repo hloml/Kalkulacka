@@ -4,7 +4,7 @@
     ViewBag.Title = "Poved Kalkulátor tarifu";
 }
 
-<h2>Poved Kalkulátor tarifu</h2>
+<h2>Tarifní kalkulačka jízdného</h2>
 
 @using (Html.BeginForm())
 {
@@ -100,10 +100,10 @@
     <hr />
     
     if (@Model.isNetwork || @Model.zone > 0) {
-    if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Vnější zóna</h4> }
+    if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
     <table class="table table-striped">
         <thead>
-            <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
         </thead>
         <tbody>
             
@@ -116,10 +116,8 @@
                     <td>@item.category</td>
                     <td>@item.TariffName</td>
                     <td>
-                        @if (@Model.zone > 0) {
-                            if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
-                            @item.price
-                        }
+                        @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
+                        @item.price Kč
                     </td>
                 </tr>
             }
@@ -128,10 +126,10 @@
     }
     <hr />
     if (!@Model.isNetwork && @Model.innerZone) {
-    <h4>Vnitřní zóna</h4>
+    <h4>Jízdné pro @Html.DisplayNameFor(model => model.innerZone)</h4>
     <table class="table table-striped">
         <thead>
-            <tr><th>Začátek tarifu</th><th>Konec tarifu</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
         </thead>
         <tbody>
             @foreach (var item in Model.tarifsInner)
@@ -143,7 +141,7 @@
                     <td>@item.category</td>
                     <td>@item.TariffName</td>
                     <td>
-                        @item.price
+                        @item.price Kč
                     </td>
                 </tr>
             }
@@ -184,7 +182,7 @@
         <div class="form-group">
             <label for="fuelConsumptionAmount" class="control-label col-md-4">
                 Průměrná spotřeba paliva:
-                <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
                 <div id="fuelConsumption" style="margin-top:12px"></div>
@@ -194,7 +192,7 @@
         <div class="form-group">
             <label for="fuelPriceAmount" class="control-label col-md-4">
                 Cena paliva:
-                <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
                 <div id="fuelPrice" style="margin-top:12px"></div>
@@ -204,7 +202,7 @@
         <div class="form-group">
             <label for="pathDistanceAmount" class="control-label col-md-4">
                 Délka trasy (tam i zpět):
-                <input type="text" id="pathDistanceAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <input type="text" id="pathDistanceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
                 <div id="pathDistance" style="margin-top:12px"></div>
@@ -214,7 +212,7 @@
         <div class="form-group">
             <label for="parkingPriceAmount" class="control-label col-md-4">
                 Cena parkování:
-                <input type="text" id="parkingPriceAmount" readonly style="border:0; color:#2e6e9e; font-weight:bold;" size="12">
+                <input type="text" id="parkingPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
             </label>
             <div class="col-md-8">
                 <div id="parkingPrice" style="margin-top:12px"></div>
@@ -280,8 +278,3 @@
 
 
 }
-    <hr />    
-
-    <div>
-        @Html.ActionLink("Back to List", "Index")
-    </div>

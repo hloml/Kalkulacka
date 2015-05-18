@@ -115,14 +115,14 @@ function countAll() {
         $("#loosing").removeClass("label-default").addClass("label-danger");
         $(".text-success").removeClass("text-success").addClass("text-danger");
         $(".saving-loosing").text("Prodělávám").removeClass("label-success").addClass("label-danger");
-        $("#smile").removeClass("glyphicon glyphicon-thumbs-up");
+        $("#smile").text("");
     } else {
         //$(".help-block").text("+ šetřím");
         $("#saving").removeClass("label-default").addClass("label-success");
         $("#loosing").removeClass("label-danger").addClass("label-default");
         $(".text-danger").removeClass("text-danger").addClass("text-success");
         $(".saving-loosing").text("Šetřím").removeClass("label-danger").addClass("label-success");
-        $("#smile").addClass("glyphicon glyphicon-thumbs-up");
+        $("#smile").html("<img src=\"/Content/smile/smiley-dance.gif\" alt=\"šetřím\" \\>");
     }
 }
 
