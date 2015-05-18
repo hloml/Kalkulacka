@@ -125,6 +125,7 @@
     <Content Include="Content\jquery-ui-1.11.4.custom\jquery-ui.theme.css" />
     <Content Include="Content\jquery-ui-1.11.4.custom\jquery-ui.theme.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Content\smile\smiley-dance.gif" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.js" />
