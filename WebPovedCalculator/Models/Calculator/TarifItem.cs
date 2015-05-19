@@ -10,7 +10,7 @@ namespace WebPovedCalculator.Models
     /// <summary>
     /// Store informations about chossen tariff
     /// when tariff starts and end, his price and number of days for its
-    /// tariffName for his identification and category
+    /// tariffName for his identification and category of customer
     /// </summary>
     public class TarifItem
     {

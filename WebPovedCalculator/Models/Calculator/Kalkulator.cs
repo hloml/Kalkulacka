@@ -35,6 +35,7 @@ namespace WebPovedCalculator.Models
         public const String NETWORK_ZONE_NAME = "síťové jízdné";
 
 
+        // categories for counting on holidays
         public const String ISIC = "ISIC";
         public const String fullFare = "plné jízdné";
 
@@ -230,9 +231,9 @@ namespace WebPovedCalculator.Models
             return tarifs;
         }
 
-        // counts prices for day, year and half-year tariffs
         /// <summary>
-        /// Method combine avalaible tarifs for best posible price
+        /// Method combine available tarifs for best posible price
+        /// Possible tariffs are 380days(must start at 1.1), 190days(must start at 1 day of month), and 1..123 days 
         /// </summary>
         /// <param name="startDate">Date when customer start using transport</param>
         /// <param name="endDate">Date when customer end using transport</param>
@@ -255,7 +256,7 @@ namespace WebPovedCalculator.Models
             if (yearsDifference > 1)    // year difference higher than one year
             {
 
-                tarifItemsContainer = bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), category, true, zone);
+                tarifItemsContainer = bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), category, true, zone);  // count best price for start year
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -263,7 +264,7 @@ namespace WebPovedCalculator.Models
                 totalPrice = price * (yearsDifference -1);
                 tmpDate = new DateTime(startDate.Year + 1, 1, 1);
                
-                for (int i = 1; i < yearsDifference - 1; i++)
+                for (int i = 1; i < yearsDifference - 1; i++)                   // for years beetwen is best 380 tariff
                 {
                     tarifItems.Add(CreateTarifItem(ONE_YEAR, tmpDate, tmpDate.AddDays(ONE_YEAR), price, ONE_YEAR_TARIF, category));
                     tmpDate = tmpDate.AddYears(1);
@@ -271,7 +272,7 @@ namespace WebPovedCalculator.Models
 
                 tmpDate = tmpDate.AddDays(-1).AddDays(ONE_YEAR);
 
-                tarifItemsContainer = bestPriceForYear(tmpDate, endDate, category, true, zone);
+                tarifItemsContainer = bestPriceForYear(tmpDate, endDate, category, true, zone);         // count best price for end year
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -286,6 +287,7 @@ namespace WebPovedCalculator.Models
             }
             else if (yearsDifference == 1)  // year difference one year, try combine for each year
             {
+                // count for each year separately
                 tarifItemsContainer = bestPriceForYear(startDate, new DateTime(startDate.Year, 12, 31), category, true, zone);
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
@@ -301,6 +303,7 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear(); 
 
+                // try to combine for both years 
                 tarifItemsContainer = bestPriceForYear(startDate, endDate, category, true, zone);
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
@@ -370,8 +373,9 @@ namespace WebPovedCalculator.Models
 
             if (daysDifference > HALF_YEAR)                                   // days difference higher than half year (try more combinations)
             {
+                // combine 190 tariff from start of month and count remaining days with 1..123 tariffs
                 tmpDate = startDate.AddDays(-startDate.Day + 1);
-                price = Count190Price(category, zone);
+                price = Count190Price(category, zone);      
                 totalPrice = price;
                 tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
                 tmpDate = tmpDate.AddDays(HALF_YEAR);
@@ -387,9 +391,11 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
+                // count remaining days with 1..123 tariffs to start of next month then 
+                //combine 190 tariff from start of month and count remaining days with 1..123 tariffs
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
-                totalPrice = tarifItemsContainer.price;
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     
+                totalPrice = tarifItemsContainer.price;                                                                      
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
@@ -410,7 +416,8 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
-                tarifItemsContainer = Combine190tarifs(startDate, endDate, category, zone); 
+                // try combinations with more than one 190 tarifs
+                tarifItemsContainer = Combine190tarifs(startDate, endDate, category, zone);         
                 totalPrice = tarifItemsContainer.price; 
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -424,8 +431,9 @@ namespace WebPovedCalculator.Models
             else       // days difference smaller than half year (try another combinations)
             {
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
-                tmpDate = startDate.AddDays(-(daysInMonth - startDate.Day + 1));
 
+                // count remaining days with 1..123 tariffs to start of next month then combine with 190 tariff
+                tmpDate = startDate.AddDays(-(daysInMonth - startDate.Day + 1));
                 tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, tmpDate, category, zone);    
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
@@ -440,9 +448,10 @@ namespace WebPovedCalculator.Models
                     bestPrice = totalPrice;
                 }
                 tarifItems.Clear();
-            
+
+                // combine 190 tariff from start of month and count remaining days with 1..123 tariffs
                 tmpDate = startDate.AddDays(-startDate.Day + 1);
-                price = Count190Price(category, zone);
+                price = Count190Price(category, zone);              
                 totalPrice = price;
                 tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
                 tmpDate = startDate.AddDays(HALF_YEAR);
@@ -458,7 +467,8 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
-                tarifItemsContainer = CountForRemainingDays(daysDifference, startDate, category, zone);   
+                // combine only with 1..123 tariffs
+                tarifItemsContainer = CountForRemainingDays(daysDifference, startDate, category, zone);     
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -498,11 +508,12 @@ namespace WebPovedCalculator.Models
             int daysDifference = DaysDifference(startDate, endDate);
             float bestPrice = float.MaxValue;
             List<TarifItem> bestTarifItems = new List<TarifItem>();
-            
-         
+
+                //combine 190 tariff from start of month and count remaining days to next month with 1..123 tariffs
+                // then 190 tariff and count remaining days to the end with 1..123 tariffs
                 tmpDate = startDate.AddDays(-startDate.Day + 1);
-                price = Count190Price(category, zone);
-                totalPrice = price * 2;
+                price = Count190Price(category, zone);                  
+                totalPrice = price * 2;                                 
    
                 tmpDate = tmpDate.AddDays(HALF_YEAR);
 
@@ -510,14 +521,14 @@ namespace WebPovedCalculator.Models
                
                 int daysInMonth = DateTime.DaysInMonth(tmpDate.Year, tmpDate.Month);
               
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - tmpDate.Day , tmpDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - tmpDate.Day , tmpDate, category, zone);     
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 tmpDate = tmpDate.AddDays(daysInMonth - tmpDate.Day + 1);
                 tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
                 
-                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);    
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -528,9 +539,11 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
-                daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);     
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
-                totalPrice = tarifItemsContainer.price;
+                // count remaining days to next month with 1..123 tariffs, add 190 tariff and count remaining days to next month with 1..123 tariffs
+                // then 190 tariff and count remaining days to the end with 1..123 tariffs
+                daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, startDate, category, zone);     
+                totalPrice = tarifItemsContainer.price;                                                                  
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
@@ -540,13 +553,13 @@ namespace WebPovedCalculator.Models
                 tmpDate = tmpDate.AddDays(HALF_YEAR);
                 
                 daysInMonth = DateTime.DaysInMonth(tmpDate.Year, tmpDate.Month);
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - tmpDate.Day + 1, tmpDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - tmpDate.Day + 1, tmpDate, category, zone);     
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 tmpDate = tmpDate.AddDays(daysInMonth - tmpDate.Day + 1);
                 tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
-                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);     
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -557,8 +570,11 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
+
+                // count remaining days to next month with 1..123 tariffs, add 190 tariff and another 190 tariff from start of month
+                // then count remaining days to the end with 1..123 tariffs
                 daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);    
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -571,7 +587,7 @@ namespace WebPovedCalculator.Models
 
                 tmpDate = new DateTime(tmpDate.Year, tmpDate.Month, 1);
                 tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
-                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate.AddDays(HALF_YEAR), endDate), tmpDate.AddDays(HALF_YEAR), category, zone);     
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
             
@@ -582,6 +598,8 @@ namespace WebPovedCalculator.Models
                 }
                 tarifItems.Clear();
 
+                // 190 tariff from start of month and another 190 tariff from start of month
+                // then count remaining days to the end with 1..123 tariffs
                 tmpDate = startDate.AddDays(-startDate.Day + 1);
                 price = Count190Price(category, zone);
                 totalPrice = price * 2;
@@ -674,7 +692,7 @@ namespace WebPovedCalculator.Models
 
 
         /// <summary>
-        /// Method combine avalaible tarifs for best posible price, counting for student is different
+        /// Method combine available tarifs for best posible price, counting for student is different
         /// Student have tarifs for 10 months, 1 month and for 1..123 days, can have discount ISIC for holidays
         /// </summary>
         /// <param name="startDate">Date when customer start using transport</param>
@@ -693,7 +711,7 @@ namespace WebPovedCalculator.Models
 
             do
             {
-                if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) > 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 6, 1)) < 0))
+                if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) > 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 6, 1)) < 0))    // tafiff starts on holidays
                 {
                     tarifItemsContainer = CountForHoliday(startDate, new DateTime(startDate.Year, 8, 31), category, zone, isISIC);
                     totalPrice += tarifItemsContainer.price;
@@ -702,12 +720,12 @@ namespace WebPovedCalculator.Models
 
 
                 tmp = MakeDatetimeToHolidays(tmpDate, endDate);
-                tarifItemsContainer = CountForSchoolYear(tmpDate, tmp, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForSchoolYear(tmpDate, tmp, category, zone);     // count for school year except holidays
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
                 tmpDate = tmp;
 
-                if (DateTime.Compare(tmpDate, endDate) < 0)      // spocteme pro prazdniny
+                if (DateTime.Compare(tmpDate, endDate) < 0)      // count for holidays
                 {
                     tmp = MakeDatetimeForHolidays(tmpDate, endDate);
                     tarifItemsContainer = CountForHoliday(tmpDate.AddDays(1), tmp, category, zone, isISIC);
@@ -749,6 +767,7 @@ namespace WebPovedCalculator.Models
 
         /// <summary>
         /// Check date and modify if necessary to end after holidays, because counting tariffs for students is different on holidays
+        /// if endDate is smaller than end of holidays it return endDate, else it returns end of holidays
         /// </summary>
         /// <param name="startDate">Date when tariff starts</param>
         /// <param name="endDate">Date when tariff ends</param>
@@ -765,7 +784,6 @@ namespace WebPovedCalculator.Models
         }
 
 
-        // if student have isic, change category for holidays
        /// <summary>
        /// Count tariff for students on holidays, if he doesnt have isic then he pay full price
        /// with isic he has special tariff only for holidays
@@ -810,7 +828,8 @@ namespace WebPovedCalculator.Models
             float totalPrice;
             float bestPrice = float.MaxValue;
 
-            price += Get10MonthsPrice(category, zone);
+            // get price for 10 months tariff
+            price += Get10MonthsPrice(category, zone);          
             tarifItems.Add(CreateTarifItem(TEN_MONTHS, new DateTime(startDate.Year, 9, 1), new DateTime(startDate.Year + 1, 6, 30), price, TEN_MONTHS_TARIF, category));
             totalPrice = price;
            
@@ -822,18 +841,19 @@ namespace WebPovedCalculator.Models
             tarifItems.Clear();
             totalPrice = 0;
 
-            if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // algoritmus je pro vice nez 1 mesic
+            // combine month tariff and 1..123 tariff
+            if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // Algorithm counts for tariff longer than one month
             {
                 price = GetMonthPrice(category, zone);
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     // count days to next month with 1..123 tariff
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
                 tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
 
                 while (tmpDate.Year != endDate.Year || tmpDate.Month != endDate.Month)
-                {    // pro kazdy mesic mezi
+                {    // for each month beetwen start and end
                     tarifItems.Add(CreateTarifItem(ONE_MONTH, tmpDate, tmpDate.AddMonths(1), price, ONE_MONTH_TARIF, category));
                     totalPrice += price;
                     tmpDate = tmpDate.AddMonths(1);
@@ -841,7 +861,7 @@ namespace WebPovedCalculator.Models
 
             }
 
-            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate), tmpDate, category, zone);     //pricteme pocet dnu od zacatku mesice, protoze tarif na 190 dnu musi zacinat od 1 dne mesice
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate), tmpDate, category, zone);     // count days to end with 1..123 tariff
             totalPrice += tarifItemsContainer.price;
             tarifItems.AddRange(tarifItemsContainer.tarifsItems);
             
