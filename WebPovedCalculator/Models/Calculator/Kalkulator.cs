@@ -711,9 +711,10 @@ namespace WebPovedCalculator.Models
 
             do
             {
-                if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) > 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 6, 1)) < 0))    // tafiff starts on holidays
+                if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) < 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 6, 1)) >= 0))    // tafiff starts on holidays
                 {
-                    tarifItemsContainer = CountForHoliday(startDate, new DateTime(startDate.Year, 8, 31), category, zone, isISIC);
+                    tmpDate = MakeDatetimeForHolidays(tmpDate, endDate).AddDays(1);
+                    tarifItemsContainer = CountForHoliday(startDate, tmpDate, category, zone, isISIC);
                     totalPrice += tarifItemsContainer.price;
                     tarifItems.AddRange(tarifItemsContainer.tarifsItems);
                 }
