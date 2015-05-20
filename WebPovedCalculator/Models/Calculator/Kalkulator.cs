@@ -92,7 +92,7 @@ namespace WebPovedCalculator.Models
 
                 Worksheet ws = (Worksheet)sheets.get_Item(list_index);
 
-                int columns_count = ws.UsedRange.Columns.Count;
+                int columns_count = ws.UsedRange.Columns.Count + 1;
                 string[] category = new string[columns_count];
                 float[,] days_tarif = new float[columns_count, NUMBER_OF_DAYS + 1];      // for saving values for 1..123 days
 

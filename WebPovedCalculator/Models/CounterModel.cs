@@ -71,36 +71,34 @@ namespace WebPovedCalculator.Models
             switch (Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME))
             {
                 case 1:
-                    containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
                     containerOuterZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
-                    containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
-
-                    if ((((innerZone?1:0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
-                        || (containerNetworkZone.price < 0)) //network zone doesnt contain category
-                    {
-                        price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
-                        tarifs = containerOuterZone.tarifsItems.ToList();
-                        //TODO ?
-                    }
-                    else
-                    {
-                        price = containerNetworkZone.price;
-                        tarifs = containerNetworkZone.tarifsItems.ToList();
-                        isNetwork = true;
-                        //TODO ?
-                    }
-                    tarifsInner = containerInnerZone.tarifsItems.ToList();
                     break;
                 case 2:
-                    containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
                     containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME, discountISIC);
-                    price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
-                    tarifsInner = containerInnerZone.tarifsItems.ToList();
-                    tarifs = containerOuterZone.tarifsItems.ToList();
                     break;
                 default:
                     return;
             }
+
+            containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
+            containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
+
+            if ((((innerZone ? 1 : 0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
+                || (containerNetworkZone.price < 0)) //network zone doesnt contain category
+            {
+                price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
+                tarifs = containerOuterZone.tarifsItems.ToList();
+                //TODO ?
+            }
+            else
+            {
+                price = containerNetworkZone.price;
+                tarifs = containerNetworkZone.tarifsItems.ToList();
+                isNetwork = true;
+                //TODO ?
+            }
+            tarifsInner = containerInnerZone.tarifsItems.ToList();
+
 
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
 
@@ -108,6 +106,7 @@ namespace WebPovedCalculator.Models
 
         private void MakeCategories(){
             List<Tarif> listTariff = Kalkulator.ListTariff(Kalkulator.OUTER_ZONE_NAME);
+            string[] dontShowCategories = { "ISIC"};
             categories = new List<SelectListItem>();
             if (listTariff == null)
             {
@@ -117,7 +116,10 @@ namespace WebPovedCalculator.Models
             {
                 foreach (Tarif tariff in listTariff)
                 {
-                    categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
+                    if (!dontShowCategories.Contains(tariff.category))
+                    {
+                        categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
+                    }
                 }
             }
         }
