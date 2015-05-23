@@ -8,6 +8,9 @@ using WebPovedCalculator.Models;
 
 namespace WebPovedCalculator.Controllers
 {
+    /// <summary>
+    /// Controller of MVC for counting tariffs
+    /// </summary>
     public class HomeController : Controller
     {
         // GET: Home
@@ -18,6 +21,7 @@ namespace WebPovedCalculator.Controllers
             return View(counter);
         }
 
+        // GET: Counted tariff
         [HttpPost]
         public ActionResult Index(CounterModel counter)
         {

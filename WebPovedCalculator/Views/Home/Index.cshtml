@@ -1,10 +1,10 @@
 ﻿@model WebPovedCalculator.Models.CounterModel
 
 @{
-    ViewBag.Title = "Poved Kalkulátor tarifu";
+    ViewBag.Title = "Tarifní kalkulačka jízdného";
 }
 
-<h2>Tarifní kalkulačka jízdného</h2>
+<h2>@ViewBag.Title</h2>
 
 @using (Html.BeginForm())
 {
@@ -18,6 +18,7 @@
 
     @Html.AntiForgeryToken()
     
+    // Form for count tariff
     <div class="form-horizontal">
 
         <hr />
@@ -99,6 +100,7 @@
     
     <hr />
     
+    // Counted tariff minor results
     if (@Model.isNetwork || @Model.zone > 0) {
     if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
     <table class="table table-striped">
@@ -149,6 +151,7 @@
     </table>
     }
 
+    // Counted tariff main results
     <div class="form-group">
         <h3>
             <span class="label label-default">Doba: @Model.daysDifference dní</span>
@@ -176,7 +179,7 @@
     <h3>Srovnání nákladů: Auto X Veřejná doprava</h3>
     <hr />
     
-    //Chosing car parameters
+    // Car - public transport comparsion form
     <div class="form-horizontal">
 
         <div class="form-group">
@@ -223,7 +226,7 @@
 
     <hr />
     
-    //Car - public transport comparsion result
+    // Car - public transport comparsion results
     <div class="form-horizontal">
         <div class="form-group">
             <label class="control-label col-md-6" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>

@@ -14,16 +14,34 @@ namespace WebPovedCalculator.Models
     /// </summary>
     public class TarifItem
     {
+        /// <summary>
+        /// Days
+        /// </summary>
         public int days { get; set; }
 
+        /// <summary>
+        /// Start date
+        /// </summary>
         public DateTime dateStart { get; set; }
 
+        /// <summary>
+        /// End date
+        /// </summary>
         public DateTime dateEnd { get; set; }
 
+        /// <summary>
+        /// Price
+        /// </summary>
         public float price { get; set; }
 
+        /// <summary>
+        /// Tariff's name
+        /// </summary>
         public String TariffName { get; set; }
 
+        /// <summary>
+        /// Category
+        /// </summary>
         public String category { get; set; }
     }
 }

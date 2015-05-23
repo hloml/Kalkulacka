@@ -1,4 +1,5 @@
-﻿var TariffLenght;
+﻿// Used for compare with car part
+var TariffLenght;
 var TariffPrice;
 
 var AverageFuelConsumption;
@@ -77,6 +78,7 @@ $(function () {
 
 // --------------------------------- Core Code
 
+// Counting function for comparing public transport tariff with car, writting results into page
 function countAll() {
     // Help vars
     CarPriceOnKM = AverageFuelConsumption * LiterOfFuelPrice / 100;
@@ -108,7 +110,7 @@ function countAll() {
     $("#ResultOnPrepaidTimePriceDiff").text(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2) + " Kč");
     //$("#ResultPercentPriceDiff").text(parseFloat(PercentPriceDiff()).toFixed(2) + " %");
 
-    // Change color and help-block text
+    // Change color and help-block text and smile
     if (PercentPriceDiff() < 0) {
         //$(".help-block").text("- prodělávám");
         $("#saving").removeClass("label-success").addClass("label-default");
@@ -127,7 +129,7 @@ function countAll() {
 }
 
 
-// Inicialization
+// Inicialization, set counted tariff's length and price
 function compareWithCarInit(tariffLenght, tariffPrice) {
     TariffLenght = tariffLenght;
     TariffPrice = tariffPrice;

@@ -11,8 +11,14 @@ namespace WebPovedCalculator.Models
     /// </summary>
     public class TarifItemsContainer
     {
-        public List<TarifItem> tarifsItems {get; set;}
+        /// <summary>
+        /// List of tariffs
+        /// </summary>
+        public List<TarifItem> tarifsItems { get; set;}
 
+        /// <summary>
+        /// Price
+        /// </summary>
         public float price { get; set; }
 
     }

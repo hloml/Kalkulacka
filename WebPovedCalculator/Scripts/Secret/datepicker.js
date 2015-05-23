@@ -1,5 +1,6 @@
-﻿
-// CS locate
+﻿// Used for datepickers
+
+// CS locale
 $.datepicker.regional['cs'] = {
     closeText: 'Zavřít',
     prevText: '&#x3c;Dříve',
@@ -20,7 +21,7 @@ $.datepicker.regional['cs'] = {
 };
 $.datepicker.setDefaults($.datepicker.regional['cs']);
 
-// Inicialization
+// Inicialization of calendars, set default start date and end date
 function calendarInit(startDate, endDate) {
     $("#startDate").datepicker({
         changeMonth: true,

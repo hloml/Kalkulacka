@@ -11,6 +11,9 @@ using System.Web;
 
 namespace WebPovedCalculator.Models
 {
+    /// <summary>
+    /// Cares of counting tariffs
+    /// </summary>
     public class Kalkulator
     {
         // values of tariff types
@@ -48,7 +51,7 @@ namespace WebPovedCalculator.Models
         /// Get dictionary with informations about tariffs
         /// if dictionary is not initialized, than load it from excel
         /// </summary>
-        /// <returns></returns>
+        /// <returns>dictionary filled with excel data</returns>
         public static Dictionary<String, List<Tarif>> GetExcel()
         {
             if (tarifDictionary == null)
@@ -64,7 +67,7 @@ namespace WebPovedCalculator.Models
         /// Load tarifs for all zones from excel file and save them into dictionary
         /// </summary>
         /// <param name="filename">path with name of excel file</param>
-        /// <returns></returns>
+        /// <returns>dictionary filled with excel data</returns>
         public static Dictionary<String, List<Tarif>> LoadExcel(string filename)
         {
             Application xlsApp = new Application();
@@ -201,12 +204,12 @@ namespace WebPovedCalculator.Models
 
   
         /// <summary>
-        /// Saving tarifs to list - create object tarif for all categories and return arrayList with created objects.
+        /// Saving tariffs to list - create object tarif for all categories and return arrayList with created objects.
         /// </summary>
         /// <param name="category">all categories</param>
         /// <param name="days_tarif">Array for values for 1..123 for each category</param>
         /// <param name="dictionary">Dictionary for each category</param>
-        /// <returns></returns>
+        /// <returns>tariffs in list</returns>
         private static List<Tarif> SaveTarifsToList(string[] category, float[,] days_tarif, Dictionary<String, String>[] dictionary)
         {
             float[] tmp_array = new float[NUMBER_OF_DAYS + 1];
@@ -238,7 +241,7 @@ namespace WebPovedCalculator.Models
         /// <param name="startDate">Date when customer start using transport</param>
         /// <param name="endDate">Date when customer end using transport</param>
         /// <param name="category">Customer category</param>
-        /// <param name="zone">Zone</param>
+        /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         public static TarifItemsContainer CountTariff(DateTime startDate, DateTime endDate, String category, String zone)
         {
@@ -347,7 +350,7 @@ namespace WebPovedCalculator.Models
         /// <param name="endDate">Date when tariff ends</param>
         /// <param name="category">Customer category</param>
         /// <param name="allowed">Method can combine for next year</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         public static TarifItemsContainer bestPriceForYear(DateTime startDate, DateTime endDate, String category, Boolean allowed, String zone)
         {
@@ -495,7 +498,7 @@ namespace WebPovedCalculator.Models
         /// <param name="startDate">Date when tariff starts</param>
         /// <param name="endDate">Date when tariff ends</param>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         public static TarifItemsContainer Combine190tarifs(DateTime startDate, DateTime endDate, String category, String zone)
         {
@@ -634,7 +637,7 @@ namespace WebPovedCalculator.Models
        /// <param name="days">Number of day</param>
         /// <param name="startDate">Date when tariff starts</param>
        /// <param name="category">Customer category</param>
-       /// <param name="zone"></param>
+       /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         public static TarifItemsContainer CountForRemainingDays(int days, DateTime startDate, String category, String zone)
         {
@@ -675,7 +678,7 @@ namespace WebPovedCalculator.Models
         /// </summary>
         /// <param name="daysDifference">number of days (should be beetwen 1 and 123)</param>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>Price</returns>
         public static float CountDaysPrice(int daysDifference, String category, String zone)
         {
@@ -748,7 +751,7 @@ namespace WebPovedCalculator.Models
         /// </summary>
         /// <param name="startDate">Date when tariff starts</param>
         /// <param name="endDate">Date when tariff ends</param>
-        /// <returns></returns>
+        /// <returns>Corrected date</returns>
         static DateTime MakeDatetimeToHolidays(DateTime startDate, DateTime endDate)
         {
             DateTime tmpDate = new DateTime(startDate.Year, 6, 30);
@@ -772,7 +775,7 @@ namespace WebPovedCalculator.Models
         /// </summary>
         /// <param name="startDate">Date when tariff starts</param>
         /// <param name="endDate">Date when tariff ends</param>
-        /// <returns></returns>
+        /// <returns>Corrected date</returns>
         static DateTime MakeDatetimeForHolidays(DateTime startDate, DateTime endDate)
         {
             DateTime tmpDate = new DateTime(startDate.Year, 8, 31);
@@ -792,9 +795,9 @@ namespace WebPovedCalculator.Models
         /// <param name="startDate">Date when tariff starts</param>
         /// <param name="endDate">Date when tariff ends</param>
        /// <param name="category">Customer category</param>
-       /// <param name="zone"></param>
+       /// <param name="zone">Zone name</param>
        /// <param name="isISIC">has isic discount</param>
-       /// <returns></returns>
+       /// <returns>Tariff</returns>
         static TarifItemsContainer CountForHoliday(DateTime startDate, DateTime endDate, String category, String zone, Boolean isISIC)
         {
             TarifItemsContainer tarifItemsContainer;
@@ -817,7 +820,7 @@ namespace WebPovedCalculator.Models
        /// <param name="startDate">Date when tariff starts</param>
        /// <param name="endDate">Date when tariff ends</param>
        /// <param name="category">Customer category</param>
-       /// <param name="zone"></param>
+       /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         static TarifItemsContainer CountForSchoolYear(DateTime startDate, DateTime endDate, String category, String zone)
         {
@@ -884,7 +887,7 @@ namespace WebPovedCalculator.Models
         /// Get price for year tariff
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>price or -2 if price wasnt found</returns>
         public static float Count380Price(String category, String zone)
         {
@@ -904,7 +907,7 @@ namespace WebPovedCalculator.Models
         /// Get price for half-year tariff
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>price or -2 if price wasnt found</returns>
         public static float Count190Price(String category, String zone)
         {
@@ -923,7 +926,7 @@ namespace WebPovedCalculator.Models
         /// Get price for 10 months tariff
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>price or -2 if price wasnt found</returns>
         public static float Get10MonthsPrice(String category, String zone)
         {
@@ -942,7 +945,7 @@ namespace WebPovedCalculator.Models
         /// Get price for one month tariff
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>price or -2 if price wasnt found</returns>
         public static float GetMonthPrice(String catrgory, String zone)
         {
@@ -960,13 +963,12 @@ namespace WebPovedCalculator.Models
 
 
 
-        // counts day difference between start and end date
         /// <summary>
         /// Counts day difference between start and end date
         /// </summary>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <returns></returns>
+        /// <param name="startDate">Start date</param>
+        /// <param name="endDate">End date</param>
+        /// <returns>Days difference</returns>
         public static int DaysDifference(DateTime startDate, DateTime endDate)
         {
             int daysDifference = (int)(endDate.Date - startDate.Date).TotalDays + 1;
@@ -977,8 +979,8 @@ namespace WebPovedCalculator.Models
         /// Select right tariff by category
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
+        /// <param name="zone">Zone name</param>
+        /// <returns>Tariff</returns>
         public static Tarif TariffChooser(String category, String zone)
         {
             List<Tarif> listTariff = ListTariff(zone);
@@ -998,8 +1000,8 @@ namespace WebPovedCalculator.Models
         /// <summary>
         /// Return list of all tariffs (for categories)
         /// </summary>
-        /// <param name="zone"></param>
-        /// <returns></returns>
+        /// <param name="zone">Zone name</param>
+        /// <returns>List of all tariffs in zone</returns>
         public static List<Tarif> ListTariff(String zone)
         {
             List<Tarif> listTariff;
@@ -1012,7 +1014,7 @@ namespace WebPovedCalculator.Models
         /// Get method for counting best tariff
         /// </summary>
         /// <param name="category">Customer category</param>
-        /// <param name="zone"></param>
+        /// <param name="zone">Zone name</param>
         /// <returns>1 - normal counting, 2 - students counting, 0 - cant calculate</returns>
         public static int getCountingMethod(String category, String zone)
         {
@@ -1025,13 +1027,13 @@ namespace WebPovedCalculator.Models
         /// <summary>
         /// Help method for creating tarifItems
         /// </summary>
-        /// <param name="days"></param>
-        /// <param name="dateStart"></param>
-        /// <param name="dateEnd"></param>
-        /// <param name="price"></param>
-        /// <param name="tarifName"></param>
-        /// <param name="category"></param>
-        /// <returns></returns>
+        /// <param name="days">Days</param>
+        /// <param name="dateStart">Start date</param>
+        /// <param name="dateEnd">End date</param>
+        /// <param name="price">Price</param>
+        /// <param name="tarifName">Name of tariff</param>
+        /// <param name="category">Category</param>
+        /// <returns>Tariff item</returns>
         private static TarifItem CreateTarifItem(int days, DateTime dateStart, DateTime dateEnd, float price, String tarifName, String category)
         {
             return new TarifItem { days = days, dateStart = dateStart, dateEnd = dateEnd, price = price, TariffName = tarifName, category = category };
