@@ -155,7 +155,7 @@ namespace WebPovedCalculator.Models
         /// </summary>
         private void MakeCategories(){
             List<Tarif> listTariff = Kalkulator.ListTariff(Kalkulator.OUTER_ZONE_NAME);
-            string[] dontShowCategories = { "ISIC"};
+           
             categories = new List<SelectListItem>();
             if (listTariff == null)
             {
@@ -165,7 +165,7 @@ namespace WebPovedCalculator.Models
             {
                 foreach (Tarif tariff in listTariff)
                 {
-                    if (!dontShowCategories.Contains(tariff.category))
+                    if (!Kalkulator.DISCOUNTS_LIST.Contains(tariff.category))
                     {
                         categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
                     }
