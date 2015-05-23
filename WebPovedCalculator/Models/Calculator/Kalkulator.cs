@@ -3,11 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-
 
 namespace WebPovedCalculator.Models
 {
@@ -54,150 +54,11 @@ namespace WebPovedCalculator.Models
             if (tarifDictionary == null)
             {
                 EXCEL_PATH = HttpContext.Current.Server.MapPath("~/");
-                tarifDictionary = LoadExcel(EXCEL_PATH + EXCEL_NAME);
+                tarifDictionary = LoadExcel(EXCEL_PATH);
             }
             return tarifDictionary;
         }
 
-
-        /// <summary>
-        /// Load tarifs for all zones from excel file and save them into dictionary
-        /// </summary>
-        /// <param name="filename">path with name of excel file</param>
-        /// <returns></returns>
-        public static Dictionary<String, List<Tarif>> LoadExcel(string filename)
-        {
-            Application xlsApp = new Application();
-
-            if (!System.IO.File.Exists(filename))
-            {
-                Console.WriteLine("File " + filename + " doesnt exist");
-                return null;
-            }
-
-            if (xlsApp == null)
-            {
-                Console.WriteLine("EXCEL could not be started. Check that your office installation and project references are correct.");
-                return null;
-            }
-
-            Workbook wb = xlsApp.Workbooks.Open(filename,
-                0, true, 5, "", "", true, XlPlatform.xlWindows, "\t", false, false, 0, true);
-            Sheets sheets = wb.Worksheets;
-
-            Dictionary<String, List<Tarif>> tarifs_dictionary = new Dictionary<string, List<Tarif>>();
-
-            for (int list_index = 1; list_index <= sheets.Count; list_index++)
-            {    // iterate over all lists from excel
-
-                Worksheet ws = (Worksheet)sheets.get_Item(list_index);
-
-                int columns_count = ws.UsedRange.Columns.Count + 1;
-                string[] category = new string[columns_count];
-                float[,] days_tarif = new float[columns_count, NUMBER_OF_DAYS + 1];      // for saving values for 1..123 days
-
-                Dictionary<String, String>[] dictionary = new Dictionary<string, string>[columns_count];     // for other values, storing them with key (380 dni, 180dni, mesicni ..)
-
-                for (int j = 0; j < columns_count; j++)      // initiate array of dictionaries
-                {
-                    dictionary[j] = new Dictionary<string, string>();
-                }
-
-                IterateOverAllCells(ws, dictionary, category, days_tarif);       // iterate all cells in actual list
-
-                List<Tarif> tarifs = SaveTarifsToList(category, days_tarif, dictionary);    // create object tarif for each category and save objects to arraylist
-                tarifs_dictionary.Add(ws.Name, tarifs);      // save tarifs to dictionary with zone name as a key
-
-            }
-            return tarifs_dictionary;
-        }
-
-
-        /// <summary>
-        /// Iterate over all cells in excel and find all categories. For categories fill array (for 1..123 days) and dictionary obtained from parameters
-        /// </summary>
-        /// <param name="ws">excel worksheet</param>
-        /// <param name="dictionary">Dictionary for each category</param>
-        /// <param name="category">Array for categories</param>
-        /// <param name="days_tarif">Array for values for 1..123 for each category</param>
-        private static void IterateOverAllCells(Worksheet ws, Dictionary<String, String>[] dictionary, string[] category, float[,] days_tarif)
-        {
-            bool isNumeric, isCategory;
-            float column_value;
-            int column_index, columns_count = ws.UsedRange.Columns.Count, first_column;
-            string first_column_string;
-
-
-            foreach (Range row in ws.UsedRange.Rows)        // iterate all rows
-            {
-                column_index = 0;
-                first_column = -1;
-                isCategory = false;
-                first_column_string = "";
-
-                foreach (Range cell in row.Columns)     // iterate all columns
-                {
-                    column_index++;
-
-                    if (cell.Value2 != null)    // cell is not empty
-                    {
-                        isNumeric = float.TryParse(cell.Value2.ToString(), out column_value);
-
-                        if (isNumeric)  // cell value is number
-                        {
-                            if (column_index == 1)     // first column
-                            {
-                                first_column = (int)Math.Ceiling(column_value); ;
-                            }
-                            else if (first_column != -1)    // first column is number (1, 123)
-                            {
-                                if (first_column > 0 && first_column <= NUMBER_OF_DAYS)
-                                {
-                                    days_tarif[column_index, first_column] = column_value;
-                                }
-                                else
-                                {
-                                    dictionary[column_index].Add(first_column.ToString(), cell.Value2.ToString());
-                                }
-                            }
-                            else if (!string.IsNullOrEmpty(first_column_string))    // first column is not number (mesicni, 380 dni)
-                            {
-                                dictionary[column_index].Add(first_column_string, cell.Value2.ToString());
-                            }
-                        }
-                        else     // cell value is string
-                        {
-                            String s = cell.Value2.ToString();
-                            if (column_index == 1)  //  first column
-                            {
-                                switch (s)
-                                {
-                                    case "dny": isCategory = true; break;
-                                    default: first_column_string = s; break;
-                                }
-
-                            }
-                            else if (isCategory == true)    // actual row values are category
-                            {
-                                category[column_index] = cell.Value2.ToString();
-                            }
-                            else     // some other value, save to dictionary
-                            {
-                                if (first_column != -1)
-                                {
-                                    dictionary[column_index].Add(first_column.ToString(), s);
-                                }
-                                else if (!string.IsNullOrEmpty(first_column_string))
-                                {
-                                    dictionary[column_index].Add(first_column_string, s);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
 
   
         /// <summary>
@@ -1037,6 +898,91 @@ namespace WebPovedCalculator.Models
             return new TarifItem { days = days, dateStart = dateStart, dateEnd = dateEnd, price = price, TariffName = tarifName, category = category };
         }
 
+
+
+        /// <summary>
+        /// Load tarifs for all zones from excel file and save them into dictionary
+        /// </summary>
+        /// <param name="filepath">path with name of excel file</param>
+        /// <returns></returns>
+        public static Dictionary<String, List<Tarif>> LoadExcel(string filePath)
+        {
+            String[] files = { INNER_ZONE_NAME, NETWORK_ZONE_NAME, OUTER_ZONE_NAME };
+
+            Dictionary<String, List<Tarif>> tarifs_dictionary = new Dictionary<string, List<Tarif>>();
+
+            for (int list_index = 0; list_index < files.Length; list_index++)
+            {    // iterate over all files
+                List<Tarif> tarifs = IterateOverAllCells(filePath + files[list_index] + ".csv");       // iterate all cells in actual list
+                tarifs_dictionary.Add(files[list_index], tarifs);      // save tarifs to dictionary with zone name as a key          
+            }
+            return tarifs_dictionary;
+        }
+
+
+
+        private static List<Tarif> IterateOverAllCells(String file)
+        {
+            bool isNumeric, isCategory;
+            float column_value;
+            int columns_count, first_column;
+
+            if (!System.IO.File.Exists(file))
+            {
+                Console.WriteLine("File " + file + " doesnt exist");
+                return null;
+            }
+
+            var reader = new StreamReader(File.OpenRead(@file));
+            string line = reader.ReadLine().Replace(@"""", ""); 
+            string[] values = line.Split(';');
+            columns_count = values.Length - 1;
+
+            Dictionary<String, String>[] dictionary = new Dictionary<string, string>[columns_count];
+            string[] category = new String[columns_count];
+            float[,] days_tarif = new float[columns_count, NUMBER_OF_DAYS + 1];
+            for (int j = 0; j < columns_count; j++)      // initiate array of dictionaries
+            {
+                dictionary[j] = new Dictionary<string, string>();
+            }
+
+            for (int i = 1; i < values.Length; i++)
+            {
+                category[i - 1] = values[i]; 
+            }
+
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine().Replace(@"""", "");
+                values = line.Split(';');
+
+                
+
+                if (!String.IsNullOrEmpty(values[0]))
+                {
+
+                    isCategory = int.TryParse(values[0], out first_column);
+
+
+                    for (int i = 1; i < values.Length; i++)
+                    {
+                        if (isCategory && (first_column > 0 && first_column <= NUMBER_OF_DAYS))
+                        {
+                            isNumeric = float.TryParse(values[i], out column_value);
+                            days_tarif[i - 1, first_column] = column_value;
+
+                        }
+                        else if (!String.IsNullOrEmpty(values[i])) {
+                            dictionary[i - 1].Add(values[0], values[i]);
+                        }
+                   }
+                }
+            }
+
+
+            List<Tarif> tarifs = SaveTarifsToList(category, days_tarif, dictionary);    // create object tarif for each category and save objects to arraylist
+            return tarifs;
+        }   
 
     }
 }
