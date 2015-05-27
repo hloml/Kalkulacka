@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using WebPovedCalculator.Models.Calculator;
-
 
 namespace WebPovedCalculator.Models
 {
@@ -60,10 +60,12 @@ namespace WebPovedCalculator.Models
             if (tarifDictionary == null)
             {
                 EXCEL_PATH = HttpContext.Current.Server.MapPath("~/");
-                tarifDictionary = TarifLoader.LoadExcel(EXCEL_PATH + EXCEL_NAME);
+                tarifDictionary = TarifLoader.LoadExcel(EXCEL_PATH);
+
             }
             return tarifDictionary;
         }
+
 
 
         /// <summary>
@@ -870,7 +872,6 @@ namespace WebPovedCalculator.Models
         {
             return new TarifItem { days = days, dateStart = dateStart, dateEnd = dateEnd, price = price, TariffName = tarifName, category = category };
         }
-
 
     }
 }
