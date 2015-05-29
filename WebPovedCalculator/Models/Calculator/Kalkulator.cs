@@ -59,7 +59,7 @@ namespace WebPovedCalculator.Models
         {
             if (tarifDictionary == null)
             {
-                EXCEL_PATH = HttpContext.Current.Server.MapPath("~/");
+                EXCEL_PATH = HttpContext.Current.Server.MapPath("~/Content/tarifs/");
                 tarifDictionary = TarifLoader.LoadExcel(EXCEL_PATH);
 
             }

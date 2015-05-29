@@ -39,9 +39,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -77,6 +74,7 @@
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Mvc">
       <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.2\lib\net45\System.Web.Mvc.dll</HintPath>
@@ -131,6 +129,9 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\tarifs\předplatné - vnější zóny.csv" />
+    <Content Include="Content\tarifs\předplatné zóna 001 Plzeň.csv" />
+    <Content Include="Content\tarifs\síťové jízdné.csv" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\Secret\comparewithcar.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -152,6 +153,7 @@
     <Compile Include="Models\Calculator\Tarif.cs" />
     <Compile Include="Models\Calculator\TarifItem.cs" />
     <Compile Include="Models\Calculator\TarifItemsContainer.cs" />
+    <Compile Include="Models\Calculator\TarifLoader.cs" />
     <Compile Include="Models\CompareWithCarModel.cs" />
     <Compile Include="Models\CounterModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

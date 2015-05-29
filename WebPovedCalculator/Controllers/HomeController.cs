@@ -17,7 +17,6 @@ namespace WebPovedCalculator.Controllers
         public ActionResult Index()
         {
             CounterModel counter = new CounterModel();
-            ViewBag.Jmeno = "sad";
             return View(counter);
         }
 
