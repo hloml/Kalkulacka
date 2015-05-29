@@ -878,5 +878,21 @@ namespace WebPovedCalculator.Models
             return new TarifItem { days = days, dateStart = dateStart, dateEnd = dateEnd, price = price, TariffName = tarifName, category = category };
         }
 
+        /// <summary>
+        /// Return note for category
+        /// </summary>
+        /// <param name="category">Category</param>
+        /// <returns>note</returns>
+        public static String GetNoteByCategory(String category)
+        {
+            switch (category)
+            {
+                case "ZTP":
+                    return "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem.";
+                default:
+                    return "";
+            }
+        }
+
     }
 }

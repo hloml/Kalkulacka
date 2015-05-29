@@ -89,6 +89,11 @@ namespace WebPovedCalculator.Models
         public int daysDifference { get; set; }
 
         /// <summary>
+        /// Note for category
+        /// </summary>
+        public String note { get; set; }
+
+        /// <summary>
         /// Sets default values for client's demands
         /// </summary>
         public CounterModel()
@@ -109,6 +114,8 @@ namespace WebPovedCalculator.Models
         /// </summary>
         public void GetPrice()
         {
+            note = Kalkulator.GetNoteByCategory(category);
+
             TarifItemsContainer containerInnerZone;
             TarifItemsContainer containerOuterZone;
             TarifItemsContainer containerNetworkZone;

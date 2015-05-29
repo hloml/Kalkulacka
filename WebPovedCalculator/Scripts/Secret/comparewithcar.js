@@ -10,6 +10,8 @@ var ParkingFee;
 var CarPriceOnKM;
 var TariffPriceOnKM;
 
+var rgx = /(\d+)(\d{3})/;
+
 // Slider - fuelConsumption
 $(function () {
     $("#fuelConsumption").slider({
@@ -107,7 +109,7 @@ function countAll() {
     $("#ResultPriceOfPath").text(parseFloat(PriceOfPath()).toFixed(2) + " Kč");
     $("#ResultKilometerPriceDiff").text(parseFloat(KilometerPriceDiff()).toFixed(2) + " Kč");
     $("#ResultOnDistancePriceDiff").text(parseFloat(OnDistancePriceDiff()).toFixed(2) + " Kč");
-    $("#ResultOnPrepaidTimePriceDiff").text(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2) + " Kč");
+    $("#ResultOnPrepaidTimePriceDiff").text(parseFloat(OnPrepaidTimePriceDiff()).toFixed(2).replace(rgx, '$1' + ' ' + '$2') + " Kč");
     //$("#ResultPercentPriceDiff").text(parseFloat(PercentPriceDiff()).toFixed(2) + " %");
 
     // Change color and help-block text and smile

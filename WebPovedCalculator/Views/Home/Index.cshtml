@@ -47,7 +47,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.startDate, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.startDate, new { @class = "form-control jquery_datepicker", @Value = Model.startDate.ToShortDateString() })
+                @Html.TextBoxFor(model => model.startDate, new { @class = "form-control jquery_datepicker", @Value = Model.startDate.ToShortDateString().Replace(" ", "") })
                 @Html.ValidationMessageFor(model => model.startDate)
             </div>
         </div>
@@ -55,7 +55,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.endDate, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.endDate, new { @class = "form-control jquery_datepicker", @Value = Model.endDate.ToShortDateString() })
+                @Html.TextBoxFor(model => model.endDate, new { @class = "form-control jquery_datepicker", @Value = Model.endDate.ToShortDateString().Replace(" ", "") })
                 @Html.ValidationMessageFor(model => model.endDate)
             </div>
         </div>
@@ -100,6 +100,14 @@
     
     <hr />
     
+    // Note
+    if (@Model.note != "")
+    {
+        <div class="alert alert-warning" role="alert">
+            <strong>@Model.category:</strong> @Model.note
+        </div>
+    }
+    
     // Counted tariff minor results
     if (@Model.isNetwork || @Model.zone > 0) {
     if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
@@ -119,7 +127,7 @@
                     <td>@item.TariffName</td>
                     <td>
                         @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
-                        @item.price Kč
+                        @item.price.ToString("n0") Kč
                     </td>
                 </tr>
             }
@@ -143,7 +151,7 @@
                     <td>@item.category</td>
                     <td>@item.TariffName</td>
                     <td>
-                        @item.price Kč
+                        @item.price.ToString("n0") Kč
                     </td>
                 </tr>
             }
@@ -170,7 +178,7 @@
             }
         </h3>
         <h2>
-            <span class="label label-info">Celková cena: @Model.price Kč</span>
+            <span class="label label-info">Celková cena: @Model.price.ToString("n0") Kč</span>
         </h2>
     </div>
     <hr />
