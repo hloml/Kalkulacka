@@ -113,9 +113,10 @@ namespace WebPovedCalculator.Models
             TarifItemsContainer containerOuterZone;
             TarifItemsContainer containerNetworkZone;
             isNetwork = false;
+            int countingMethod = Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME);    
 
             // selects how will be tariff for outer zones counted and count it
-            switch (Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME))
+            switch (countingMethod)
             {
                 case 1:
                     containerOuterZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
@@ -132,7 +133,8 @@ namespace WebPovedCalculator.Models
             containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
 
             // selects if tariffs are for all (network) zones
-            if ((((innerZone ? 1 : 0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
+            if (countingMethod == 2  ||        // students dont have network zone
+                (((innerZone ? 1 : 0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
                 || (containerNetworkZone.price < 0)) //network zone doesnt contain category
             {
                 price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);

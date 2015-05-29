@@ -44,6 +44,7 @@ namespace WebPovedCalculator.Models
         // categories for counting on holidays
         public const String ISIC = "ISIC";
         public const String fullFare = "plné jízdné";
+        public const String halfFare = "poloviční jízdné";
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
         private const String EXCEL_NAME = "operational_tariff_v2.xls";
@@ -101,7 +102,7 @@ namespace WebPovedCalculator.Models
                 totalPrice = price * (yearsDifference -1);
                 tmpDate = new DateTime(startDate.Year + 1, 1, 1);
                
-                for (int i = 1; i < yearsDifference - 1; i++)                   // for years beetwen is best 380 tariff
+                for (int i = 1; i <= yearsDifference - 1; i++)                   // for years beetwen is best 380 tariff
                 {
                     tarifItems.Add(CreateTarifItem(ONE_YEAR, tmpDate, tmpDate.AddDays(ONE_YEAR), price, ONE_YEAR_TARIF, category));
                     tmpDate = tmpDate.AddYears(1);
@@ -198,11 +199,11 @@ namespace WebPovedCalculator.Models
             TarifItemsContainer tarifItemsContainer;
 
             float bestPrice = Count380Price(category, zone);    // try 380day tariff first
-            bestTarifItems.Add(CreateTarifItem(ONE_YEAR, new DateTime(startDate.Year, 1, 1), new DateTime(startDate.Year, 12, 31), bestPrice, ONE_YEAR_TARIF, category));
+            bestTarifItems.Add(CreateTarifItem(ONE_YEAR, new DateTime(startDate.Year, 1, 1), new DateTime(startDate.Year, 1, 1).AddDays(380), bestPrice, ONE_YEAR_TARIF, category));
 
             if (allowed)    // try combine with next year, if its allowed
             {
-                tarifItemsContainer = bestPriceForYear(new DateTime(startDate.Year + 1, 1, 1), endDate, category, false, zone);
+                tarifItemsContainer = bestPriceForYear(new DateTime(startDate.Year, 1, 1).AddDays(380), endDate, category, false, zone);
                 bestPrice += tarifItemsContainer.price;
                 bestTarifItems.AddRange(tarifItemsContainer.tarifsItems);
             }
@@ -639,9 +640,13 @@ namespace WebPovedCalculator.Models
             {
                 category = ISIC;
             }
-            else 
+            else if (category.Equals("student (15 - 26 let)"))
             {
                 category = fullFare;
+            }
+            else
+            {
+                category = halfFare;
             }
             tarifItemsContainer = CountForRemainingDays(DaysDifference(startDate, endDate) - 1, startDate, category, zone);
             return tarifItemsContainer;
