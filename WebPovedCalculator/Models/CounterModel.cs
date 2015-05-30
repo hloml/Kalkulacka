@@ -304,6 +304,10 @@ namespace WebPovedCalculator.Models
             }
             else
             {
+                foreach (String tariff in Kalkulator.categoriesList)
+                {
+                    categories.Add(new SelectListItem { Text = tariff, Value = tariff });
+                }
                 foreach (Tarif tariff in listTariff)
                 {
                     if (!Kalkulator.DISCOUNTS_LIST.Contains(tariff.category))
@@ -311,12 +315,6 @@ namespace WebPovedCalculator.Models
                         categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
                     }
                 }
-
-                foreach (String tariff in Kalkulator.categoriesList)
-                {
-                    categories.Add(new SelectListItem { Text = tariff, Value = tariff });
-                }
-
             }
         }
 

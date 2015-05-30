@@ -63,7 +63,7 @@ namespace WebPovedCalculator.Models
         public static String[] DISCOUNTS_LIST = { ISIC, pensionerFare, schoolFare, halfFare, fullFare };
 
         // list of categories not in csv files
-        public static String[] categoriesList = { childFare, pensionerTo65Fare, pensionerTo70Fare, pensioner70AndMoreFare, adolescentFare, adultFare };
+        public static String[] categoriesList = { childFare,adolescentFare,adultFare , pensionerTo65Fare, pensionerTo70Fare, pensioner70AndMoreFare};
 
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
@@ -122,11 +122,14 @@ namespace WebPovedCalculator.Models
                 totalPrice = price * (yearsDifference -1);
                 tmpDate = new DateTime(startDate.Year + 1, 1, 1);
                
-                for (int i = 1; i <= yearsDifference - 1; i++)                   // for years beetwen is best 380 tariff
+                for (int i = 1; i < yearsDifference - 1; i++)                   // for years beetwen is best 380 tariff
                 {
                     tarifItems.Add(CreateTarifItem(ONE_YEAR, tmpDate, tmpDate.AddDays(ONE_YEAR), price, ONE_YEAR_TARIF, category));
                     tmpDate = tmpDate.AddYears(1);
                 }
+
+                tarifItems.Add(CreateTarifItem(ONE_YEAR, tmpDate, tmpDate.AddDays(ONE_YEAR), price, ONE_YEAR_TARIF, category));
+                tmpDate = tmpDate.AddDays(ONE_YEAR);
 
                 tarifItemsContainer = bestPriceForYear(tmpDate, endDate, category, true, zone);         // count best price for end year
                 totalPrice += tarifItemsContainer.price;
