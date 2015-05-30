@@ -22,7 +22,7 @@ namespace WebPovedCalculator.Models.Calculator
         /// <returns></returns>
         public static Dictionary<String, List<Tarif>> LoadExcel(string filePath)
         {
-            String[] files = { Kalkulator.INNER_ZONE_NAME, Kalkulator.NETWORK_ZONE_NAME, Kalkulator.OUTER_ZONE_NAME };
+            String[] files = { Kalkulator.INNER_ZONE_NAME, Kalkulator.NETWORK_ZONE_NAME, Kalkulator.OUTER_ZONE_NAME, "zvýhodněné jízdné" };
 
             Dictionary<String, List<Tarif>> tarifs_dictionary = new Dictionary<string, List<Tarif>>();
 

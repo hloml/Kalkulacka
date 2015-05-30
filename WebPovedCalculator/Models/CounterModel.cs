@@ -164,12 +164,27 @@ namespace WebPovedCalculator.Models
                     }
                     break;
                 case Kalkulator.pensionerTo65Fare:         //důchodce (do 65 let)
+                    if (discountsJanskeho)
+                    {
+                        GetPriceForJanskehoDiscount();
+                        return;
+                    }
                     GetPrice(Kalkulator.halfFare, Kalkulator.fullFare, Kalkulator.pensionerFare);
                     break;
                 case Kalkulator.pensionerTo70Fare:    //důchodce (65 - 70 let)
+                    if (discountsJanskeho)
+                    {
+                        GetPriceForJanskehoDiscount();
+                        return;
+                    }
                     GetPrice(Kalkulator.halfFare, Kalkulator.pensionerFare, Kalkulator.pensionerFare);
                     break;
                 case Kalkulator.pensioner70AndMoreFare:            //důchodce (70 a více let)
+                    if (discountsJanskeho)
+                    {
+                        GetPriceForJanskehoDiscount();
+                        return;
+                    }
                     GetPrice("free", Kalkulator.pensionerFare, Kalkulator.pensionerFare);
                     note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
                     break;
@@ -180,6 +195,32 @@ namespace WebPovedCalculator.Models
                 default:
                     return;
             }
+        }
+
+
+        public void GetPriceForJanskehoDiscount()
+        {
+            TarifItemsContainer containerInnerZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.ZONES, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
+            TarifItemsContainer containerOuterZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.ZONES, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
+            TarifItemsContainer containerNetworkZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.NETWORK_ZONE, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
+
+            if ((((innerZone ? 1 : 0) * containerInnerZone.price) + (zone * containerOuterZone.price)) < containerNetworkZone.price
+                || (containerNetworkZone.price < 0)) //network zone doesnt contain category
+            {
+                price = (innerZone ? 1 : 0) * containerInnerZone.price + (zone * containerOuterZone.price);
+                tarifs = containerOuterZone.tarifsItems.ToList();
+            }
+            else
+            {
+                price = containerNetworkZone.price;
+                tarifs = containerNetworkZone.tarifsItems.ToList();
+                isNetwork = true;
+            }
+
+            tarifsInner = containerInnerZone.tarifsItems.ToList();
+
+            // counts days difference
+            daysDifference = Kalkulator.DaysDifference(startDate, endDate);
         }
 
 

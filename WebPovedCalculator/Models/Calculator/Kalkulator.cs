@@ -36,6 +36,7 @@ namespace WebPovedCalculator.Models
         public const String INNER_ZONE_NAME = "předplatné zóna 001 Plzeň";
         public const String OUTER_ZONE_NAME = "předplatné - vnější zóny";
         public const String NETWORK_ZONE_NAME = "síťové jízdné";
+        public const String DISCOUNT_ZONE_NAME = "zvýhodněné jízdné";
 
         // categories for counting on holidays
         public const String ISIC = "ISIC";
@@ -52,6 +53,11 @@ namespace WebPovedCalculator.Models
         public const String pensionerTo70Fare = "Důchodce (65 - 70 let)";
         public const String pensioner70AndMoreFare = "Důchodce (70 a více let)";
         public const String adultFare = "Dospělý (od 15 let)";
+        
+        // discounted zone categories
+        public const String ZONES = "zóny";
+        public const String NETWORK_ZONE = "síťová jízdenka";
+        
 
         // list of discounts names
         public static String[] DISCOUNTS_LIST = { ISIC, pensionerFare, schoolFare, halfFare, fullFare };
@@ -749,6 +755,43 @@ namespace WebPovedCalculator.Models
             return tarifItemsContainer;
         }
 
+
+        public static TarifItemsContainer CountPriceForJanskehoPensioner(string category, string dataCategory, DateTime startDate, DateTime endDate, string zone)
+        {
+            List<TarifItem> tarifItems = new List<TarifItem>();
+            TarifItemsContainer tarifItemsContainer = new TarifItemsContainer();
+            float price = 0;
+            float totalPrice = 0;
+            price = GetYearJanskeho(dataCategory, zone);
+
+            do
+            {
+                tarifItems.Add(CreateTarifItem(365, startDate, startDate.AddYears(1), price, ONE_YEAR_TARIF, category));
+                totalPrice += price;
+                startDate = startDate.AddYears(1);
+                
+            } while (DateTime.Compare(startDate, endDate) < 0);
+
+            tarifItemsContainer.price = totalPrice;
+            tarifItemsContainer.tarifsItems = tarifItems.ToList();
+
+            return tarifItemsContainer;
+        }
+
+
+        public static float GetYearJanskeho(String category, String zone)
+        {
+            Tarif choosenTariff = TariffChooser(category, zone);
+            if (choosenTariff == null) return -1;
+
+            int oneYearPrice;
+            String yearsPriceString;
+            if (!choosenTariff.Dictionary.TryGetValue(ONE_YEAR_TARIF, out yearsPriceString)) return -2; // year prepay not found
+
+            if (!Int32.TryParse(yearsPriceString, out oneYearPrice)) return float.MaxValue; // error in string to int
+
+            return oneYearPrice;
+        }
 
         /// <summary>
         /// Get price for year tariff
