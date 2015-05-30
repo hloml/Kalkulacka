@@ -39,7 +39,11 @@ namespace WebPovedCalculator.Models
 
 
         // list of discounts names
-        public static String[] DISCOUNTS_LIST = { "ISIC" };
+        public static String[] DISCOUNTS_LIST = { "ISIC", "důchodce" };
+
+        public static String[] categoriesList = { "Dítě (do 6 let)", "Důchodce (do 65 let)", "Důchodce (65 - 70 let)", "Důchodce (70 a více let)" };
+
+
 
         // categories for counting on holidays
         public const String ISIC = "ISIC";
@@ -684,27 +688,28 @@ namespace WebPovedCalculator.Models
             tarifItems.Clear();
             totalPrice = 0;
 
-            // combine month tariff and 1..123 tariff
-            if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // Algorithm counts for tariff longer than one month
-            {
-                price = GetMonthPrice(category, zone);
-                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+            //// combine month tariff and 1..123 tariff
+            //if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // Algorithm counts for tariff longer than one month
+            //{
+            //    price = GetMonthPrice(category, zone);
+            //    int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     // count days to next month with 1..123 tariff
-                totalPrice = tarifItemsContainer.price;
-                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
-                tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
+            //    tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);     // count days to next month with 1..123 tariff
+            //    totalPrice = tarifItemsContainer.price;
+            //    tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+            //    tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
 
-                while (tmpDate.Year != endDate.Year || tmpDate.Month != endDate.Month)
-                {    // for each month beetwen start and end
-                    tarifItems.Add(CreateTarifItem(ONE_MONTH, tmpDate, tmpDate.AddMonths(1), price, ONE_MONTH_TARIF, category));
-                    totalPrice += price;
-                    tmpDate = tmpDate.AddMonths(1);
-                }
+            //    while (tmpDate.Year != endDate.Year || tmpDate.Month != endDate.Month)
+            //    {    // for each month beetwen start and end
+            //        tarifItems.Add(CreateTarifItem(ONE_MONTH, tmpDate, tmpDate.AddMonths(1), price, ONE_MONTH_TARIF, category));
+            //        totalPrice += price;
+            //        tmpDate = tmpDate.AddMonths(1);
+            //    }
 
-            }
-
-            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate), tmpDate, category, zone);     // count days to end with 1..123 tariff
+            //}
+            
+            // if you uncoment code above, you must change this line and change startDate with tmpDate !!!!!!
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(startDate, endDate), startDate, category, zone);     // count days to end with 1..123 tariff
             totalPrice += tarifItemsContainer.price;
             tarifItems.AddRange(tarifItemsContainer.tarifsItems);
             

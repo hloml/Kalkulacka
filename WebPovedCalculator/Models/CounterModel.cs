@@ -157,7 +157,7 @@ namespace WebPovedCalculator.Models
         /// </summary>
         private void MakeCategories(){
             List<Tarif> listTariff = Kalkulator.ListTariff(Kalkulator.OUTER_ZONE_NAME);
-           
+
             categories = new List<SelectListItem>();
             if (listTariff == null)
             {
@@ -172,6 +172,12 @@ namespace WebPovedCalculator.Models
                         categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
                     }
                 }
+
+                foreach (String tariff in Kalkulator.categoriesList)
+                {
+                    categories.Add(new SelectListItem { Text = tariff, Value = tariff });
+                }
+
             }
         }
 
