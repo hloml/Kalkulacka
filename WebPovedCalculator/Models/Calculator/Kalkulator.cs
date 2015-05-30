@@ -128,8 +128,6 @@ namespace WebPovedCalculator.Models
                     tmpDate = tmpDate.AddYears(1);
                 }
 
-                tmpDate = tmpDate.AddDays(-1).AddDays(ONE_YEAR);
-
                 tarifItemsContainer = bestPriceForYear(tmpDate, endDate, category, true, zone);         // count best price for end year
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
