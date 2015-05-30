@@ -16,6 +16,9 @@
         });
     </script>
 
+    // Hide checkboxes inicialization
+    <script src="~/Scripts/Secret/hidecheckbox.js"></script>
+
     @Html.AntiForgeryToken()
     
     // Form for count tariff
@@ -32,30 +35,35 @@
                 @Html.ValidationMessageFor(model => model.category)
             </div>
         </div>
-
         <div class="form-group">
-            @Html.LabelFor(model => model.discountISIC, new { @class = "control-label col-md-2" })
-            <div class="col-md-1">
-                <div class="checkbox">
-                    <label>
-                        @Html.CheckBoxFor(model => model.discountISIC)
-                    </label>
+            <div id="isicDiscount">
+                @Html.LabelFor(model => model.discountISIC, new { @class = "control-label col-md-2" })
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(model => model.discountISIC)
+                        </label>
+                    </div>
                 </div>
             </div>
-            @Html.LabelFor(model => model.discountsSchool, new { @class = "control-label col-md-2" })
-            <div class="col-md-1">
-                <div class="checkbox">
-                    <label>
-                        @Html.CheckBoxFor(model => model.discountsSchool)
-                    </label>
+            <div id="schoolDiscount">
+                @Html.LabelFor(model => model.discountsSchool, new { @class = "control-label col-md-2" })
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(model => model.discountsSchool)
+                        </label>
+                    </div>
                 </div>
             </div>
-            @Html.LabelFor(model => model.discountsJanskeho, new { @class = "control-label col-md-2" })
-            <div class="col-md-1">
-                <div class="checkbox">
-                    <label>
-                        @Html.CheckBoxFor(model => model.discountsJanskeho)
-                    </label>
+            <div id="janskehoDiscount">
+                @Html.LabelFor(model => model.discountsJanskeho, new { @class = "control-label col-md-2" })
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(model => model.discountsJanskeho)
+                        </label>
+                    </div>
                 </div>
             </div>
          </div>
@@ -105,7 +113,7 @@
 }
 
 
-@if (@Model.price > 0)
+@if (@Model.innerZone || @Model.zone > 0)
 {
     // Compare With Car inicialization
     <script src="~/Scripts/Secret/comparewithcar.js"></script>
@@ -118,7 +126,7 @@
     <hr />
     
     // Note
-    if (@Model.note != "")
+    if (@Model.note != null)
     {
         <div class="alert alert-warning" role="alert">
             <strong>@Model.category:</strong> @Model.note
@@ -127,53 +135,88 @@
     
     // Counted tariff minor results
     if (@Model.isNetwork || @Model.zone > 0) {
-    if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
-    <table class="table table-striped">
-        <thead>
-            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
-        </thead>
-        <tbody>
+        if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
+        if (@Model.tarifs != null) {
             
-            @foreach (var item in Model.tarifs)
+            if (@Model.tarifs.Count > 0)
             {
-                <tr>
-                    <td>@item.dateStart.ToShortDateString()</td>
-                    <td>@item.dateEnd.ToShortDateString()</td>
-                    <td>@item.days</td>
-                    <td>@item.category</td>
-                    <td>@item.TariffName</td>
-                    <td>
-                        @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
-                        @item.price.ToString("n0") Kč
-                    </td>
-                </tr>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+                    </thead>
+                    <tbody>
+            
+                        @foreach (var item in Model.tarifs)
+                        {
+                            <tr>
+                                <td>@item.dateStart.ToShortDateString()</td>
+                                <td>@item.dateEnd.ToShortDateString()</td>
+                                <td>@item.days</td>
+                                <td>@item.category</td>
+                                <td>@item.TariffName</td>
+                                <td>
+                                    @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
+                                    @item.price.ToString("n0") Kč
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    <strong>@Model.category:</strong> Jízda v @if (@Model.isNetwork) { <i>Síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                <strong>@Model.category:</strong> Jízda v @if (@Model.isNetwork) { <i>Síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
+            </div>
+        }
     }
     <hr />
     if (!@Model.isNetwork && @Model.innerZone) {
-    <h4>Jízdné pro @Html.DisplayNameFor(model => model.innerZone)</h4>
-    <table class="table table-striped">
-        <thead>
-            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.tarifsInner)
+        <h4>Jízdné pro @Html.DisplayNameFor(model => model.innerZone)</h4>
+        if (@Model.tarifs != null) {
+            if (@Model.tarifsInner.Count > 0)
             {
-                <tr>
-                    <td>@item.dateStart.ToShortDateString()</td>
-                    <td>@item.dateEnd.ToShortDateString()</td>
-                    <td>@item.days</td>
-                    <td>@item.category</td>
-                    <td>@item.TariffName</td>
-                    <td>
-                        @item.price.ToString("n0") Kč
-                    </td>
-                </tr>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.tarifsInner)
+                        {
+                            <tr>
+                                <td>@item.dateStart.ToShortDateString()</td>
+                                <td>@item.dateEnd.ToShortDateString()</td>
+                                <td>@item.days</td>
+                                <td>@item.category</td>
+                                <td>@item.TariffName</td>
+                                <td>
+                                    @item.price.ToString("n0") Kč
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    <strong>@Model.category:</strong> Jízda v <i>@Html.DisplayNameFor(model => model.innerZone)</i> je <strong>zdarma</strong>.
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                <strong>@Model.category:</strong> Jízda v <i>@Html.DisplayNameFor(model => model.innerZone)</i> je <strong>zdarma</strong>.
+            </div>
+        }
     }
 
     // Counted tariff main results

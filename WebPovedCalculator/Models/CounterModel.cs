@@ -129,6 +129,7 @@ namespace WebPovedCalculator.Models
             {
                 case Kalkulator.ztpFare:          //ZTP
                     GetPrice("free", Kalkulator.ztpFare, Kalkulator.ztpFare);
+                    note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
                     break;
                 case Kalkulator.adultFare:           //Dospely
                     if (discountsJanskeho)
