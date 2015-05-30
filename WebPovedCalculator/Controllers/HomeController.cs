@@ -26,7 +26,7 @@ namespace WebPovedCalculator.Controllers
         {
             if (ModelState.IsValid)
             {
-                counter.GetPrice();
+                counter.CountPrice();
             }
 
             return View(counter);

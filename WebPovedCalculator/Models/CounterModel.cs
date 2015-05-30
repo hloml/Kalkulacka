@@ -69,6 +69,19 @@ namespace WebPovedCalculator.Models
         public Boolean discountISIC { get; set; }
 
         /// <summary>
+        /// Client's demand of school discount
+        /// </summary>
+        [Display(Name = "žákovské jízdné")]
+        public Boolean discountsSchool { get; set; }
+
+        /// <summary>
+        /// Client's demand of ISIC discount
+        /// </summary>
+        [Display(Name = "Zlatá Jánského Plaketa")]
+        public Boolean discountsJanskeho { get; set; }
+
+
+        /// <summary>
         /// List of counted tariffs for outer zone  OR  all (network) zones
         /// </summary>
         public List<TarifItem> tarifs { get; set; }
@@ -109,35 +122,109 @@ namespace WebPovedCalculator.Models
 
         }
 
+
+        public void CountPrice()
+        {
+            switch (category)
+            {
+                case Kalkulator.ztpFare:          //ZTP
+                    GetPrice("free", Kalkulator.ztpFare, Kalkulator.ztpFare);
+                    break;
+                case Kalkulator.adultFare:           //Dospely
+                    if (discountsJanskeho)
+                    {
+                        GetPrice(Kalkulator.halfFare, Kalkulator.halfFare, Kalkulator.halfFare);
+                    }
+                    else
+                    {
+                        GetPrice(Kalkulator.fullFare, Kalkulator.fullFare, Kalkulator.fullFare);
+                    }         
+                    break;
+                case Kalkulator.studentFare:              //student (15 - 26let)
+                    if (discountsSchool)
+                    {
+                        GetPrice(Kalkulator.studentFare, Kalkulator.studentFare, Kalkulator.studentFare);
+                    }
+                    else
+                    {
+                        GetPrice(Kalkulator.fullFare, Kalkulator.fullFare, Kalkulator.fullFare);
+                    }
+                    break;
+                case Kalkulator.businessFare:            //firemní
+                    GetPrice(Kalkulator.businessFare, Kalkulator.businessFare, Kalkulator.businessFare);
+                    break;
+                case Kalkulator.adolescentFare:            //dítě (6 - 15 let)
+                    if (discountsSchool)
+                    {
+                        GetPrice(Kalkulator.schoolFare, Kalkulator.schoolFare, Kalkulator.schoolFare);
+                    }
+                    else
+                    {
+                        GetPrice(Kalkulator.halfFare, Kalkulator.halfFare, Kalkulator.halfFare);
+                    }
+                    break;
+                case Kalkulator.pensionerTo65Fare:         //důchodce (do 65 let)
+                    GetPrice(Kalkulator.halfFare, Kalkulator.fullFare, Kalkulator.pensionerFare);
+                    break;
+                case Kalkulator.pensionerTo70Fare:    //důchodce (65 - 70 let)
+                    GetPrice(Kalkulator.halfFare, Kalkulator.pensionerFare, Kalkulator.pensionerFare);
+                    break;
+                case Kalkulator.pensioner70AndMoreFare:            //důchodce (70 a více let)
+                    GetPrice("free", Kalkulator.pensionerFare, Kalkulator.pensionerFare);
+                    note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
+                    break;
+                case Kalkulator.childFare:                //dítě (do 6 let)
+                    price = 0;
+                    note = "cestující s platným jízdním dokladem IDP má nárok na bezplatnou přepravu dvou dětí do 6 let";
+                    break;
+                default:
+                    return;
+            }
+        }
+
+
         /// <summary>
         /// Counts prices for client's demands
         /// </summary>
-        public void GetPrice()
+        public void GetPrice(String innerCategory, String outerCategory, String networkCategory)
         {
-            note = Kalkulator.GetNoteByCategory(category);
-
             TarifItemsContainer containerInnerZone;
             TarifItemsContainer containerOuterZone;
             TarifItemsContainer containerNetworkZone;
             isNetwork = false;
-            int countingMethod = Kalkulator.getCountingMethod(category, Kalkulator.OUTER_ZONE_NAME);    
+            int countingMethod = 1;
+            if (outerCategory.Equals(Kalkulator.studentFare) || outerCategory.Equals(Kalkulator.schoolFare))
+            {
+                countingMethod = 2;
+            }
+            
 
             // selects how will be tariff for outer zones counted and count it
             switch (countingMethod)
             {
                 case 1:
-                    containerOuterZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME);
+                    containerOuterZone = Kalkulator.CountTariff(startDate, endDate, outerCategory, Kalkulator.OUTER_ZONE_NAME);
                     break;
                 case 2:
-                    containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, category, Kalkulator.OUTER_ZONE_NAME, discountISIC);
+                    containerOuterZone = Kalkulator.CountTariffForStudents(startDate, endDate, outerCategory, Kalkulator.OUTER_ZONE_NAME, discountISIC);
                     break;
                 default:
                     return;
             }
 
             // count tariff for inner zone and all (network) zones
-            containerInnerZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.INNER_ZONE_NAME);
-            containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, category, Kalkulator.NETWORK_ZONE_NAME);
+            if (innerCategory.Equals("free"))
+            {
+                containerInnerZone = new TarifItemsContainer();
+                containerInnerZone.price = 0;
+                containerInnerZone.tarifsItems = new List<TarifItem>();
+            }
+            else
+            {
+                containerInnerZone = Kalkulator.CountTariff(startDate, endDate, innerCategory, Kalkulator.INNER_ZONE_NAME);
+            }
+
+            containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, networkCategory, Kalkulator.NETWORK_ZONE_NAME);
 
             // selects if tariffs are for all (network) zones
             if (countingMethod == 2  ||        // students dont have network zone
@@ -153,7 +240,10 @@ namespace WebPovedCalculator.Models
                 tarifs = containerNetworkZone.tarifsItems.ToList();
                 isNetwork = true;
             }
-            tarifsInner = containerInnerZone.tarifsItems.ToList();
+
+                tarifsInner = containerInnerZone.tarifsItems.ToList();
+
+            
             // counts days difference
             daysDifference = Kalkulator.DaysDifference(startDate, endDate);
 

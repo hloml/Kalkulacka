@@ -35,14 +35,31 @@
 
         <div class="form-group">
             @Html.LabelFor(model => model.discountISIC, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
+            <div class="col-md-1">
                 <div class="checkbox">
                     <label>
                         @Html.CheckBoxFor(model => model.discountISIC)
                     </label>
                 </div>
             </div>
-        </div>
+            @Html.LabelFor(model => model.discountsSchool, new { @class = "control-label col-md-2" })
+            <div class="col-md-1">
+                <div class="checkbox">
+                    <label>
+                        @Html.CheckBoxFor(model => model.discountsSchool)
+                    </label>
+                </div>
+            </div>
+            @Html.LabelFor(model => model.discountsJanskeho, new { @class = "control-label col-md-2" })
+            <div class="col-md-1">
+                <div class="checkbox">
+                    <label>
+                        @Html.CheckBoxFor(model => model.discountsJanskeho)
+                    </label>
+                </div>
+            </div>
+         </div>
+
 
         <div class="form-group">
             @Html.LabelFor(model => model.startDate, new { @class = "control-label col-md-2" })
