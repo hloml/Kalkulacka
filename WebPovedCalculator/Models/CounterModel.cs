@@ -125,6 +125,9 @@ namespace WebPovedCalculator.Models
 
         public void CountPrice()
         {
+            // counts days difference
+            daysDifference = Kalkulator.DaysDifference(startDate, endDate);
+
             switch (category)
             {
                 case Kalkulator.ztpFare:          //ZTP
@@ -220,8 +223,6 @@ namespace WebPovedCalculator.Models
 
             tarifsInner = containerInnerZone.tarifsItems.ToList();
 
-            // counts days difference
-            daysDifference = Kalkulator.DaysDifference(startDate, endDate);
         }
 
 
@@ -286,8 +287,6 @@ namespace WebPovedCalculator.Models
                 tarifsInner = containerInnerZone.tarifsItems.ToList();
 
             
-            // counts days difference
-            daysDifference = Kalkulator.DaysDifference(startDate, endDate);
 
         }
 
