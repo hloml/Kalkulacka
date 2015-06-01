@@ -692,7 +692,7 @@ namespace WebPovedCalculator.Models
             else
             {
                 price = CountDaysPrice(days, category, zone);
-                tarifItems.Add(CreateTarifItem(days, startDate, startDate.AddDays(days), price, DAYS_TARIF, category));
+                tarifItems.Add(CreateTarifItem(days + 1, startDate, startDate.AddDays(days), price, DAYS_TARIF, category));
             }
             
             tarifItemsContainer.price = price;              
