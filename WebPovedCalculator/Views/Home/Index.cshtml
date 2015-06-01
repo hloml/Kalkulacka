@@ -125,13 +125,6 @@
     
     <hr />
     
-    // Note
-    if (@Model.note != null)
-    {
-        <div class="alert alert-warning" role="alert">
-            <strong>@Model.category:</strong> @Model.note
-        </div>
-    }
     
     // Counted tariff minor results
     if (@Model.isNetwork || @Model.zone > 0) {
@@ -166,20 +159,20 @@
             else
             {
                 <div class="alert alert-info" role="alert">
-                    <strong>@Model.category:</strong> Jízda v @if (@Model.isNetwork) { <i>Síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
+                    <strong>@Model.category:</strong> Jízda ve @if (@Model.isNetwork) { <i>síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
                 </div>
             }
         }
         else
         {
             <div class="alert alert-info" role="alert">
-                <strong>@Model.category:</strong> Jízda v @if (@Model.isNetwork) { <i>Síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
+                <strong>@Model.category:</strong> Jízda ve @if (@Model.isNetwork) { <i>síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
             </div>
         }
     }
     <hr />
     if (!@Model.isNetwork && @Model.innerZone) {
-        <h4>Jízdné pro @Html.DisplayNameFor(model => model.innerZone)</h4>
+        <h4>Jízdné pro zónu 001 Plzeň</h4>
         if (@Model.tarifs != null) {
             if (@Model.tarifsInner.Count > 0)
             {
@@ -207,14 +200,14 @@
             else
             {
                 <div class="alert alert-info" role="alert">
-                    <strong>@Model.category:</strong> Jízda v <i>@Html.DisplayNameFor(model => model.innerZone)</i> je <strong>zdarma</strong>.
+                    <strong>@Model.category:</strong> Jízda v <i>zóně 001 Plzeň</i> je <strong>zdarma</strong>.
                 </div>
             }
         }
         else
         {
             <div class="alert alert-info" role="alert">
-                <strong>@Model.category:</strong> Jízda v <i>@Html.DisplayNameFor(model => model.innerZone)</i> je <strong>zdarma</strong>.
+                <strong>@Model.category:</strong> Jízda v <i>zóně 001 Plzeň</i> je <strong>zdarma</strong>.
             </div>
         }
     }
@@ -241,6 +234,21 @@
             <span class="label label-info">Celková cena: @Model.price.ToString("n0") Kč</span>
         </h2>
     </div>
+
+            // Note
+            if (@Model.note != null)
+            {
+                <div class="alert alert-warning" role="alert">
+                    <strong>@Model.category:</strong> @Model.note
+                </div>
+            }
+            // Note warning - Date before today
+            if (DateTime.Compare(@Model.startDate, DateTime.Today) < 0)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <strong>Varování:</strong> Zadané datum začátku platnosti tarifu <strong>@Model.startDate.ToShortDateString().Replace(" ", "")</strong> je před aktuálním datem <strong>@DateTime.Today.ToShortDateString().Replace(" ", "")</strong>
+                </div>
+            }
     <hr />
     <hr />
 

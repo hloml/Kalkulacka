@@ -132,7 +132,10 @@ namespace WebPovedCalculator.Models
             {
                 case Kalkulator.ztpFare:          //ZTP
                     GetPrice("free", Kalkulator.ztpFare, Kalkulator.ztpFare);
-                    note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
+                    if (innerZone)
+                    {
+                        note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
+                    }
                     break;
                 case Kalkulator.adultFare:           //Dospely
                     if (discountsJanskeho)
@@ -147,6 +150,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.studentFare:              //student (15 - 26let)
                     if (discountsSchool)
                     {
+                        note = "Při aktivaci jízdného pro zónu 001 Plzeň se musí student prokázat elektronickým potvrzením o studiu nebo potvrzením o studiu na formuláři PMDP. Žákovské jízdné platí pouze pro jízdu z místa trvalého pobytu studenta do místa sídla školy a zpět a to pouze v období aktuálního školního roku. Studenti se musí prokazovat platným žákovským průkazem při aktivaci předplatného jízdného na kartu i při každém odbavení a přepravní kontrole.";
                         GetPrice(Kalkulator.studentFare, Kalkulator.studentFare, Kalkulator.studentFare);
                     }
                     else
@@ -160,6 +164,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.adolescentFare:            //dítě (6 - 15 let)
                     if (discountsSchool)
                     {
+                        note = "Při aktivaci jízdného pro zónu 001 Plzeň se musí žák prokázat elektronickým potvrzením o studiu nebo potvrzením o studiu na formuláři PMDP. Žákovské jízdné platí pouze pro jízdu z místa trvalého pobytu studenta do místa sídla školy a zpět a to pouze v období aktuálního školního roku. Žáci se musí prokazovat platným žákovským průkazem při aktivaci předplatného jízdného na kartu i při každém odbavení a přepravní kontrole.";
                         GetPrice(Kalkulator.schoolFare, Kalkulator.schoolFare, Kalkulator.schoolFare);
                     }
                     else
@@ -190,11 +195,14 @@ namespace WebPovedCalculator.Models
                         return;
                     }
                     GetPrice("free", Kalkulator.pensionerFare, Kalkulator.pensionerFare);
-                    note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
+                    if (innerZone)
+                    {
+                        note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
+                    }
                     break;
                 case Kalkulator.childFare:                //dítě (do 6 let)
                     price = 0;
-                    note = "cestující s platným jízdním dokladem IDP má nárok na bezplatnou přepravu dvou dětí do 6 let";
+                    note = "Cestující s předplatným jízdným IDP má nárok na bezplatnou přepravu dvou dětí do 6 let.";
                     break;
                 default:
                     return;
