@@ -167,7 +167,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensionerTo65Fare:         //důchodce (do 65 let)
                     if (discountsJanskeho)
                     {
-                        GetPriceForJanskehoDiscount();
+                        GetPriceForJanskehoDiscount("");
                         return;
                     }
                     GetPrice(Kalkulator.halfFare, Kalkulator.fullFare, Kalkulator.pensionerFare);
@@ -175,7 +175,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensionerTo70Fare:    //důchodce (65 - 70 let)
                     if (discountsJanskeho)
                     {
-                        GetPriceForJanskehoDiscount();
+                        GetPriceForJanskehoDiscount("");
                         return;
                     }
                     GetPrice(Kalkulator.halfFare, Kalkulator.pensionerFare, Kalkulator.pensionerFare);
@@ -183,7 +183,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensioner70AndMoreFare:            //důchodce (70 a více let)
                     if (discountsJanskeho)
                     {
-                        GetPriceForJanskehoDiscount();
+                        GetPriceForJanskehoDiscount("free");
                         return;
                     }
                     GetPrice("free", Kalkulator.pensionerFare, Kalkulator.pensionerFare);
@@ -199,9 +199,20 @@ namespace WebPovedCalculator.Models
         }
 
 
-        public void GetPriceForJanskehoDiscount()
+        public void GetPriceForJanskehoDiscount(string categoryInner)
         {
-            TarifItemsContainer containerInnerZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.ZONES, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
+            TarifItemsContainer containerInnerZone;
+            if (categoryInner.Equals("free"))
+            {
+                containerInnerZone = new TarifItemsContainer();
+                containerInnerZone.price = 0;
+                containerInnerZone.tarifsItems = new List<TarifItem>();
+            }
+            else
+            {
+                containerInnerZone= Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.ZONES, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
+            }
+            
             TarifItemsContainer containerOuterZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.ZONES, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
             TarifItemsContainer containerNetworkZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", Kalkulator.NETWORK_ZONE, startDate, endDate, Kalkulator.DISCOUNT_ZONE_NAME);
 

@@ -132,6 +132,7 @@
     <Content Include="Content\tarifs\předplatné - vnější zóny.csv" />
     <Content Include="Content\tarifs\předplatné zóna 001 Plzeň.csv" />
     <Content Include="Content\tarifs\síťové jízdné.csv" />
+    <Content Include="Content\tarifs\zvýhodněné jízdné.csv" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\Secret\comparewithcar.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
