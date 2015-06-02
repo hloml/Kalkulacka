@@ -249,6 +249,13 @@
                     <strong>Varování:</strong> Zadané datum začátku platnosti tarifu <strong>@Model.startDate.ToShortDateString().Replace(" ", "")</strong> je před aktuálním datem <strong>@DateTime.Today.ToShortDateString().Replace(" ", "")</strong>
                 </div>
             }
+            // Note warning - tariff's enddate is after user's enddate
+            if (@Model.tariffIsLonger)
+            {
+                <div class="alert alert-success" role="alert">
+                    <strong>Info:</strong> Pro Vámi zvolené období je nejvhodnější předplatné, které přesahuje Vámi zadanou dobu platnosti.
+                </div>
+            }
     <hr />
     <hr />
 

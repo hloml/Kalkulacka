@@ -107,6 +107,11 @@ namespace WebPovedCalculator.Models
         public String note { get; set; }
 
         /// <summary>
+        /// if tariff's enddate is after user's enddate
+        /// </summary>
+        public Boolean tariffIsLonger { get; set; }
+
+        /// <summary>
         /// Sets default values for client's demands
         /// </summary>
         public CounterModel()
@@ -117,7 +122,7 @@ namespace WebPovedCalculator.Models
             MakeZones();
             // Set time for calendars
             startDate = DateTime.Today;
-            endDate = DateTime.Today.AddYears(1);
+            endDate = DateTime.Today;
 
 
         }
@@ -132,7 +137,7 @@ namespace WebPovedCalculator.Models
             {
                 case Kalkulator.ztpFare:          //ZTP
                     GetPrice("free", Kalkulator.ztpFare, Kalkulator.ztpFare);
-                    if (innerZone)
+                    if (innerZone && !isNetwork)
                     {
                         note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
                     }
@@ -175,6 +180,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensionerTo65Fare:         //důchodce (do 65 let)
                     if (discountsJanskeho)
                     {
+                        note = "Držitelé zlaté Janského plakety mají nárok na zvýhodněné roční předplatné.";
                         GetPriceForJanskehoDiscount("");
                         return;
                     }
@@ -183,6 +189,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensionerTo70Fare:    //důchodce (65 - 70 let)
                     if (discountsJanskeho)
                     {
+                        note = "Držitelé zlaté Janského plakety mají nárok na zvýhodněné roční předplatné.";
                         GetPriceForJanskehoDiscount("");
                         return;
                     }
@@ -191,11 +198,12 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.pensioner70AndMoreFare:            //důchodce (70 a více let)
                     if (discountsJanskeho)
                     {
+                        note = "Držitelé zlaté Janského plakety mají nárok na zvýhodněné roční předplatné.";
                         GetPriceForJanskehoDiscount("free");
                         return;
                     }
                     GetPrice("free", Kalkulator.pensionerFare, Kalkulator.pensionerFare);
-                    if (innerZone)
+                    if (innerZone && !isNetwork)
                     {
                         note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
                     }
@@ -239,6 +247,39 @@ namespace WebPovedCalculator.Models
                 tarifs = containerNetworkZone.tarifsItems.ToList();
                 isNetwork = true;
             }
+
+            // 7 and more zones is network
+            if ((((innerZone ? 1 : 0)  + zone) >= 7)
+                && (containerNetworkZone.price >= 0))
+            {
+                price = containerNetworkZone.price;
+                tarifs = containerNetworkZone.tarifsItems.ToList();
+                isNetwork = true;
+            }
+
+            // if tariff's enddate is after user's enddate
+            tariffIsLonger = false;
+            if (zone > 0)
+            {
+                if (tarifs != null)
+                {
+                    if (DateTime.Compare(tarifs.Last<TarifItem>().dateEnd, endDate) > 0)
+                    {
+                        tariffIsLonger = true;
+                    }
+                }
+            }
+            if (!isNetwork && innerZone)
+            {
+                if (tarifsInner != null)
+                {
+                    if (DateTime.Compare(tarifsInner.Last<TarifItem>().dateEnd, endDate) > 0)
+                    {
+                        tariffIsLonger = true;
+                    }
+                }
+            }
+            //
 
             tarifsInner = containerInnerZone.tarifsItems.ToList();
 
@@ -302,6 +343,41 @@ namespace WebPovedCalculator.Models
                 tarifs = containerNetworkZone.tarifsItems.ToList();
                 isNetwork = true;
             }
+
+
+
+            // 7 and more zones is network
+            if ((((innerZone ? 1 : 0) + zone) >= 7)
+                && (containerNetworkZone.price >= 0))
+            {
+                price = containerNetworkZone.price;
+                tarifs = containerNetworkZone.tarifsItems.ToList();
+                isNetwork = true;
+            }
+
+            // if tariff's enddate is after user's enddate
+            tariffIsLonger = false;
+            if (zone > 0)
+            {
+                if (tarifs != null)
+                {
+                    if (DateTime.Compare(tarifs.Last<TarifItem>().dateEnd, endDate) > 0)
+                    {
+                        tariffIsLonger = true;
+                    }
+                }
+            }
+            if (!isNetwork && innerZone)
+            {
+                if (tarifsInner != null)
+                {
+                    if (DateTime.Compare(tarifsInner.Last<TarifItem>().dateEnd, endDate) > 0)
+                    {
+                        tariffIsLonger = true;
+                    }
+                }
+            }
+            //
 
                 tarifsInner = containerInnerZone.tarifsItems.ToList();
 
