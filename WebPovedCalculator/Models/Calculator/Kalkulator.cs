@@ -60,10 +60,10 @@ namespace WebPovedCalculator.Models
         
 
         // list of discounts names
-        public static String[] DISCOUNTS_LIST = { ISIC, pensionerFare, schoolFare, halfFare, fullFare };
+        public static String[] DISCOUNTS_LIST = { ISIC, pensionerFare, schoolFare, halfFare, fullFare, ztpFare, businessFare, studentFare };
 
         // list of categories not in csv files
-        public static String[] categoriesList = { childFare,adolescentFare,adultFare , pensionerTo65Fare, pensionerTo70Fare, pensioner70AndMoreFare};
+        public static String[] categoriesList = { childFare, adolescentFare, studentFare, adultFare , pensionerTo65Fare, pensionerTo70Fare, pensioner70AndMoreFare, ztpFare, businessFare};
 
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
@@ -168,7 +168,7 @@ namespace WebPovedCalculator.Models
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
                 
-                if (bestPrice > totalPrice)
+                if (bestPrice >= totalPrice)
                 {
                     bestTarifItems = tarifItems.ToList();
                     bestPrice = totalPrice;
@@ -289,13 +289,13 @@ namespace WebPovedCalculator.Models
             }
             else       // days difference smaller than half year (try another combinations)
             {
-                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
                 // count remaining days with 1..123 tariffs to start of next month then combine with 190 tariff
-                tmpDate = startDate.AddDays(-(daysInMonth - startDate.Day + 1));
-                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day, tmpDate, category, zone);    
+                int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+                tarifItemsContainer = CountForRemainingDays(daysInMonth - startDate.Day + 1, startDate, category, zone);
                 totalPrice = tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+                tmpDate = startDate.AddDays(daysInMonth - startDate.Day + 1);
 
                 price = Count190Price(category, zone);
                 totalPrice += price;
@@ -309,13 +309,14 @@ namespace WebPovedCalculator.Models
                 tarifItems.Clear();
 
                 // combine 190 tariff from start of month and count remaining days with 1..123 tariffs
-                tmpDate = startDate.AddDays(-startDate.Day + 1);
-                price = Count190Price(category, zone);              
-                totalPrice = price;
-                tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
-                tmpDate = startDate.AddDays(HALF_YEAR);
 
-                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate) - 1, tmpDate.AddDays(1), category, zone);    
+                tmpDate = startDate.AddDays(-startDate.Day + 1);
+                price = Count190Price(category, zone);
+                totalPrice = price;    
+                tarifItems.Add(CreateTarifItem(HALF_YEAR, tmpDate, tmpDate.AddDays(HALF_YEAR), price, HALF_YEAR_TARIF, category));
+                tmpDate = tmpDate.AddDays(HALF_YEAR);
+
+                tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate) - 1, tmpDate.AddDays(1), category, zone);
                 totalPrice += tarifItemsContainer.price;
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
 
@@ -570,9 +571,10 @@ namespace WebPovedCalculator.Models
 
             if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) < 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 7, 1)) >= 0))    // tafiff starts on holidays
             {
-                tmpDate = MakeDatetimeForHolidays(tmpDate, endDate).AddDays(1);
+                tmpDate = MakeDatetimeForHolidays(tmpDate, endDate);
                 tarifItemsContainer = CountForHoliday(startDate, tmpDate, category, zone, isISIC);
                 totalPrice += tarifItemsContainer.price;
+                tmpDate = tmpDate.AddDays(1);
                 tarifItems.AddRange(tarifItemsContainer.tarifsItems);
             }
 
@@ -594,15 +596,17 @@ namespace WebPovedCalculator.Models
                     totalPrice += tarifItemsContainer.price;
                     tarifItems.AddRange(tarifItemsContainer.tarifsItems);
                     tmpDate = tmp.AddDays(1);
+
+                    if (DateTime.Compare(endDate, tmpDate) == 0 && (tmpDate.Month == 9 && tmpDate.Day == 1))    // when tariff ends on 1.9, its calculated but we must end loop
+                    {
+                        tarifItemsContainer = CountForSchoolYear(tmpDate, tmpDate, category, zone);
+                        totalPrice += tarifItemsContainer.price;
+                        tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+                    } 
                 }
             } while (DateTime.Compare(tmpDate, endDate) < 0 && tarifItemsContainer != null);
 
-            if (DateTime.Compare(endDate, tmpDate) == 0 && (tmpDate.Month == 9 && tmpDate.Day == 1))    // when tariff ends on 1.9, its calculated but we must end loop
-            {
-                tarifItemsContainer = CountForSchoolYear(tmpDate, tmpDate, category, zone);
-                totalPrice += tarifItemsContainer.price;
-                tarifItems.AddRange(tarifItemsContainer.tarifsItems);
-            } 
+            
 
             tarifItemsContainer = new TarifItemsContainer();
             tarifItemsContainer.price = totalPrice;
@@ -666,10 +670,11 @@ namespace WebPovedCalculator.Models
        /// <returns>Tariff</returns>
         static TarifItemsContainer CountForHoliday(DateTime startDate, DateTime endDate, String category, String zone, Boolean isISIC)
         {
+    
             TarifItemsContainer tarifItemsContainer = new TarifItemsContainer();
             List<TarifItem> tarifItems = new List<TarifItem>();
             float price;
-            int days = DaysDifference(startDate, endDate) - 1;
+            int days = DaysDifference(startDate, endDate);
 
             if (isISIC == true && category.Equals(Kalkulator.studentFare))     
             {
@@ -692,7 +697,7 @@ namespace WebPovedCalculator.Models
             else
             {
                 price = CountDaysPrice(days, category, zone);
-                tarifItems.Add(CreateTarifItem(days + 1, startDate, startDate.AddDays(days), price, DAYS_TARIF, category));
+                tarifItems.Add(CreateTarifItem(days, startDate, startDate.AddDays(days - 1), price, DAYS_TARIF, category));
             }
             
             tarifItemsContainer.price = price;              
@@ -737,12 +742,25 @@ namespace WebPovedCalculator.Models
                 bestPrice = totalPrice;
             }
             tarifItems.Clear();
-            totalPrice = float.MaxValue;
+            totalPrice = 0;
+
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(startDate, endDate), startDate, category, zone);     // count days to end with 1..123 tariff
+            totalPrice += tarifItemsContainer.price;
+            tarifItems.AddRange(tarifItemsContainer.tarifsItems);
+
+            if (bestPrice > totalPrice)
+            {
+                bestTarifItems = tarifItems.ToList();
+                bestPrice = totalPrice;
+            }
+
+            tarifItems.Clear();
+            totalPrice = 0;
 
             // combine month tariff and 1..123 tariff
             if (!(tmpDate.Year == endDate.Year && tmpDate.Month == endDate.Month))  // Algorithm counts for tariff longer than one month
             {
-                totalPrice = 0;
+                
                 price = GetMonthPrice(category, zone);
                 int daysInMonth = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
@@ -758,31 +776,17 @@ namespace WebPovedCalculator.Models
                     tmpDate = tmpDate.AddMonths(1);
                 }
     
-            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate) - 1, tmpDate, category, zone);     // count days to end with 1..123 tariff
+            tarifItemsContainer = CountForRemainingDays(DaysDifference(tmpDate, endDate) , tmpDate, category, zone);     // count days to end with 1..123 tariff
             totalPrice += tarifItemsContainer.price;
             tarifItems.AddRange(tarifItemsContainer.tarifsItems);
-            }
-
+            
             if (bestPrice > totalPrice)
             {
                 bestTarifItems = tarifItems.ToList();
                 bestPrice = totalPrice;
             }
-            tarifItems.Clear();
-            totalPrice = 0;
 
-            tarifItemsContainer = CountForRemainingDays(DaysDifference(startDate, endDate), startDate, category, zone);     // count days to end with 1..123 tariff
-            totalPrice += tarifItemsContainer.price;
-            tarifItems.AddRange(tarifItemsContainer.tarifsItems);
-
-            if (bestPrice > totalPrice)
-            {
-                bestTarifItems = tarifItems.ToList();
-                bestPrice = totalPrice;
             }
-            tarifItems.Clear();
-
-
 
             tarifItemsContainer.price = bestPrice;
             tarifItemsContainer.tarifsItems = bestTarifItems.ToList();

@@ -151,11 +151,11 @@ namespace WebPovedCalculator.Models
                     if (discountsSchool)
                     {
                         note = "Při aktivaci jízdného pro zónu 001 Plzeň se musí student prokázat elektronickým potvrzením o studiu nebo potvrzením o studiu na formuláři PMDP. Žákovské jízdné platí pouze pro jízdu z místa trvalého pobytu studenta do místa sídla školy a zpět a to pouze v období aktuálního školního roku. Studenti se musí prokazovat platným žákovským průkazem při aktivaci předplatného jízdného na kartu i při každém odbavení a přepravní kontrole.";
-                        GetPrice(Kalkulator.studentFare, Kalkulator.studentFare, Kalkulator.studentFare);
+                        GetPrice(Kalkulator.halfFare, Kalkulator.studentFare, Kalkulator.studentFare);
                     }
                     else
                     {
-                        GetPrice(Kalkulator.fullFare, Kalkulator.fullFare, Kalkulator.fullFare);
+                        GetPrice(Kalkulator.halfFare, Kalkulator.fullFare, Kalkulator.fullFare);
                     }
                     break;
                 case Kalkulator.businessFare:            //firemní
@@ -321,17 +321,17 @@ namespace WebPovedCalculator.Models
                 Console.WriteLine("ERR: List tarifu je null");
             }
             else
-            {
-                foreach (String tariff in Kalkulator.categoriesList)
-                {
-                    categories.Add(new SelectListItem { Text = tariff, Value = tariff });
-                }
+            {         
                 foreach (Tarif tariff in listTariff)
                 {
                     if (!Kalkulator.DISCOUNTS_LIST.Contains(tariff.category))
                     {
                         categories.Add(new SelectListItem { Text = tariff.category, Value = tariff.category });
                     }
+                }
+                foreach (String tariff in Kalkulator.categoriesList)
+                {
+                    categories.Add(new SelectListItem { Text = tariff, Value = tariff });
                 }
             }
         }
