@@ -327,6 +327,18 @@ namespace WebPovedCalculator.Models
                 containerInnerZone = Kalkulator.CountTariff(startDate, endDate, innerCategory, Kalkulator.INNER_ZONE_NAME);
             }
 
+
+            if (((innerZone ? 1 : 0) + zone) >= 7)      // network zone for students and school is different (students pay full Fare, for school half Fare)
+            {
+                if (networkCategory.Equals(Kalkulator.studentFare) || discountISIC)
+                {
+                    networkCategory = Kalkulator.fullFare;
+                }
+                if (networkCategory.Equals(Kalkulator.schoolFare)) {
+                    networkCategory = Kalkulator.halfFare;
+                }
+            }
+
             containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, networkCategory, Kalkulator.NETWORK_ZONE_NAME);
 
             // selects if tariffs are for all (network) zones
