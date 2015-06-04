@@ -153,6 +153,7 @@
     </Compile>
     <Compile Include="Models\Calculator\Kalkulator.cs" />
     <Compile Include="Models\Calculator\Tarif.cs" />
+    <Compile Include="Models\Calculator\TariffParameters.cs" />
     <Compile Include="Models\Calculator\TarifItem.cs" />
     <Compile Include="Models\Calculator\TarifItemsContainer.cs" />
     <Compile Include="Models\Calculator\TarifLoader.cs" />
