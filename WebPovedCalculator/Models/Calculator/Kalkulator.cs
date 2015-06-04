@@ -488,24 +488,92 @@ namespace WebPovedCalculator.Models
         }
 
 
-       /// <summary>
-       /// Count tariff for added number of days (even if its higher than 123)
-       /// </summary>
-       /// <param name="days">Number of day</param>
+        /// <summary>
+        /// Count tariff for added number of days (even if its higher than 123)
+        /// </summary>
+        /// <param name="days">Number of day</param>
         /// <param name="startDate">Date when tariff starts</param>
-       /// <param name="category">Customer category</param>
-       /// <param name="zone">Zone name</param>
+        /// <param name="category">Customer category</param>
+        /// <param name="zone">Zone name</param>
         /// <returns>TarifItemsContainer which contain list of recomended tarifs</returns>
         public static TarifItemsContainer CountForRemainingDays(int days, DateTime startDate, TariffParameters parameters)
+        {
+            float totalPrice = 0;
+            DateTime tmpDate = startDate;
+            DateTime endDate = startDate.AddDays(days - 1);
+            TarifItemsContainer container = new TarifItemsContainer();
+            String category = parameters.category;
+            List<TarifItem> tarifItems = new List<TarifItem>();
+
+            if (parameters.isISIC && !parameters.discountsSchool && parameters.zone.Equals(Kalkulator.OUTER_ZONE_NAME))  // change tariff on holidays if customer has isic discount
+            {
+
+                if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) < 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 7, 1)) >= 0))    // tafiff starts on holidays
+                {
+                    tmpDate = MakeDatetimeForHolidays(tmpDate, endDate);
+                    parameters.category = ISIC;
+                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    totalPrice += container.price;
+                    tmpDate = tmpDate.AddDays(1);
+                    tarifItems.AddRange(container.tarifsItems);
+                    startDate = tmpDate;
+                }
+
+                tmpDate = MakeDatetimeToHolidays(tmpDate, endDate);
+                parameters.category = category;
+                container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                if (container != null)
+                {
+                    totalPrice += container.price;
+                    tarifItems.AddRange(container.tarifsItems);
+                }
+                startDate = tmpDate.AddDays(1);
+
+                if (DateTime.Compare(startDate, endDate) < 0)      // count for holidays
+                {
+                    tmpDate = MakeDatetimeForHolidays(startDate, endDate);
+                    parameters.category = ISIC;
+                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    totalPrice += container.price;
+                    startDate = tmpDate.AddDays(1);
+                    tarifItems.AddRange(container.tarifsItems);
+                }
+
+                if (DateTime.Compare(startDate, endDate) < 0)      // count for holidays
+                {
+                    tmpDate = MakeDatetimeToHolidays(startDate, endDate);
+                    parameters.category = category;
+                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    if (container != null)
+                    {
+                        totalPrice += container.price;
+                        tarifItems.AddRange(container.tarifsItems);
+                    }
+                }
+                container.tarifsItems = tarifItems.ToList();
+                container.price = totalPrice;
+                parameters.category = category;
+            }
+            else
+            {
+                container = CountForRemainingDays2(days, startDate, parameters);
+            }
+
+            return container;
+        }
+
+
+        public static TarifItemsContainer CountForRemainingDays2(int days, DateTime startDate, TariffParameters parameters)
         {
             float totalPrice = 0;
             float price;
             DateTime tmpDate = startDate;
             TarifItemsContainer container = new TarifItemsContainer();
-            
+
             List<TarifItem> tarifItems = new List<TarifItem>();
-                    
-            while (days > 0) {
+
+            while (days > 0)
+            {
                 if (days > NUMBER_OF_DAYS)
                 {
                     price = CountDaysPrice(NUMBER_OF_DAYS, parameters);
@@ -521,7 +589,7 @@ namespace WebPovedCalculator.Models
 
                     tarifItems.Add(CreateTarifItem(days, tmpDate, tmpDate.AddDays(days - 1), price, DAYS_TARIF, parameters.category));
                     days = 0;
-                }          
+                }
             }
 
             container.tarifsItems = tarifItems.ToList();
@@ -568,6 +636,7 @@ namespace WebPovedCalculator.Models
             DateTime tmpDate = startDate;
             TarifItemsContainer tarifItemsContainer = new TarifItemsContainer();
             DateTime tmp;
+            
 
             if ((DateTime.Compare(startDate, new DateTime(startDate.Year, 8, 31)) < 0) && (DateTime.Compare(startDate, new DateTime(startDate.Year, 7, 1)) >= 0))    // tafiff starts on holidays
             {
@@ -675,6 +744,7 @@ namespace WebPovedCalculator.Models
             List<TarifItem> tarifItems = new List<TarifItem>();
             float price;
             int days = DaysDifference(startDate, endDate);
+            String category = parameters.category;
 
             if (parameters.isISIC == true && parameters.category.Equals(Kalkulator.studentFare))     
             {
@@ -699,9 +769,9 @@ namespace WebPovedCalculator.Models
                 price = CountDaysPrice(days, parameters);
                 tarifItems.Add(CreateTarifItem(days, startDate, startDate.AddDays(days - 1), price, DAYS_TARIF, parameters.category));
             }
-            
-            tarifItemsContainer.price = price;              
-            
+
+            parameters.category = category;
+            tarifItemsContainer.price = price;                       
             tarifItemsContainer.tarifsItems = tarifItems.ToList();
 
             return tarifItemsContainer;

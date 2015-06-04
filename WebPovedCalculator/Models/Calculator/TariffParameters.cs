@@ -16,6 +16,7 @@ namespace WebPovedCalculator.Models.Calculator
 
         public Boolean isISIC { get; set; }
 
+        public Boolean discountsSchool { get; set; }
 
     }
 }

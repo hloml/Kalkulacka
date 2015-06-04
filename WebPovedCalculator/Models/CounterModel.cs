@@ -232,11 +232,11 @@ namespace WebPovedCalculator.Models
             }
             else
             {
-                parameters = new TariffParameters { category = Kalkulator.ZONES, zone = Kalkulator.DISCOUNT_ZONE_NAME, isISIC = discountISIC };
+                parameters = new TariffParameters { category = Kalkulator.ZONES, zone = Kalkulator.DISCOUNT_ZONE_NAME, isISIC = discountISIC, discountsSchool = discountsSchool };
                 containerInnerZone= Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", parameters, startDate, endDate);
             }
 
-            parameters = new TariffParameters { category = Kalkulator.ZONES, zone = Kalkulator.DISCOUNT_ZONE_NAME, isISIC = discountISIC };
+            parameters = new TariffParameters { category = Kalkulator.ZONES, zone = Kalkulator.DISCOUNT_ZONE_NAME, isISIC = discountISIC, discountsSchool = discountsSchool };
             TarifItemsContainer containerOuterZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", parameters, startDate, endDate);
             parameters.category = Kalkulator.NETWORK_ZONE;
             TarifItemsContainer containerNetworkZone = Kalkulator.CountPriceForJanskehoPensioner("Zlatá Jánského Plaketa", parameters, startDate, endDate);
@@ -310,7 +310,7 @@ namespace WebPovedCalculator.Models
                 countingMethod = 2;
             }
 
-            parameters = new TariffParameters { category = outerCategory, zone = Kalkulator.OUTER_ZONE_NAME, isISIC = discountISIC };
+            parameters = new TariffParameters { category = outerCategory, zone = Kalkulator.OUTER_ZONE_NAME, isISIC = discountISIC, discountsSchool = discountsSchool };
 
             // selects how will be tariff for outer zones counted and count it
             switch (countingMethod)
@@ -334,7 +334,7 @@ namespace WebPovedCalculator.Models
             }
             else
             {
-                parameters = new TariffParameters { category = innerCategory, zone = Kalkulator.INNER_ZONE_NAME, isISIC = discountISIC };
+                parameters = new TariffParameters { category = innerCategory, zone = Kalkulator.INNER_ZONE_NAME, isISIC = discountISIC, discountsSchool = discountsSchool };
                 containerInnerZone = Kalkulator.CountTariff(startDate, endDate, parameters);
             }
 
@@ -350,7 +350,7 @@ namespace WebPovedCalculator.Models
                 }
             }
 
-            parameters = new TariffParameters { category = networkCategory, zone = Kalkulator.NETWORK_ZONE_NAME, isISIC = discountISIC };
+            parameters = new TariffParameters { category = networkCategory, zone = Kalkulator.NETWORK_ZONE_NAME, isISIC = discountISIC, discountsSchool = discountsSchool };
             containerNetworkZone = Kalkulator.CountTariff(startDate, endDate, parameters);
 
             // selects if tariffs are for all (network) zones
