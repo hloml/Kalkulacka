@@ -512,7 +512,7 @@ namespace WebPovedCalculator.Models
                 {
                     tmpDate = MakeDatetimeForHolidays(tmpDate, endDate);
                     parameters.category = ISIC;
-                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    container = CountDays(DaysDifference(startDate, tmpDate), startDate, parameters);
                     totalPrice += container.price;
                     tmpDate = tmpDate.AddDays(1);
                     tarifItems.AddRange(container.tarifsItems);
@@ -521,7 +521,7 @@ namespace WebPovedCalculator.Models
 
                 tmpDate = MakeDatetimeToHolidays(tmpDate, endDate);
                 parameters.category = category;
-                container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                container = CountDays(DaysDifference(startDate, tmpDate), startDate, parameters);
                 if (container != null)
                 {
                     totalPrice += container.price;
@@ -533,7 +533,7 @@ namespace WebPovedCalculator.Models
                 {
                     tmpDate = MakeDatetimeForHolidays(startDate, endDate);
                     parameters.category = ISIC;
-                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    container = CountDays(DaysDifference(startDate, tmpDate), startDate, parameters);
                     totalPrice += container.price;
                     startDate = tmpDate.AddDays(1);
                     tarifItems.AddRange(container.tarifsItems);
@@ -543,7 +543,7 @@ namespace WebPovedCalculator.Models
                 {
                     tmpDate = MakeDatetimeToHolidays(startDate, endDate);
                     parameters.category = category;
-                    container = CountForRemainingDays2(DaysDifference(startDate, tmpDate), startDate, parameters);
+                    container = CountDays(DaysDifference(startDate, tmpDate), startDate, parameters);
                     if (container != null)
                     {
                         totalPrice += container.price;
@@ -556,14 +556,14 @@ namespace WebPovedCalculator.Models
             }
             else
             {
-                container = CountForRemainingDays2(days, startDate, parameters);
+                container = CountDays(days, startDate, parameters);
             }
 
             return container;
         }
 
 
-        public static TarifItemsContainer CountForRemainingDays2(int days, DateTime startDate, TariffParameters parameters)
+        public static TarifItemsContainer CountDays(int days, DateTime startDate, TariffParameters parameters)
         {
             float totalPrice = 0;
             float price;
