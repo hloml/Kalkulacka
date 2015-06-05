@@ -5,11 +5,12 @@ using System.Web;
 
 namespace WebPovedCalculator.Models.Calculator
 {
+    /// <summary>
+    /// Storing informations about customer (category, zone and his discounts)
+    /// </summary>
     public class TariffParameters
     {
-        /// <summary>
-        /// Category
-        /// </summary>
+
         public String category { get; set; }
 
         public String zone { get; set; }

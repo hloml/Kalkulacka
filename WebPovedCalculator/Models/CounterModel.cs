@@ -129,6 +129,9 @@ namespace WebPovedCalculator.Models
         }
 
 
+        /// <summary>
+        /// Counts prices for client's demands
+        /// </summary>
         public void CountPrice()
         {
             // counts days difference
@@ -218,7 +221,10 @@ namespace WebPovedCalculator.Models
             }
         }
 
-
+        /// <summary>
+        /// Count best price for janskeho discount 
+        /// </summary>
+        /// <param name="categoryInner"></param>
         public void GetPriceForJanskehoDiscount(string categoryInner)
         {
             TarifItemsContainer containerInnerZone;

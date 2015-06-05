@@ -16,11 +16,11 @@ namespace WebPovedCalculator.Models.Calculator
 
 
         /// <summary>
-        /// Load tarifs for all zones from excel file and save them into dictionary
+        /// Load tarifs for all zones from files and save them into dictionary
         /// </summary>
         /// <param name="filepath">path with name of excel file</param>
         /// <returns></returns>
-        public static Dictionary<String, List<Tarif>> LoadExcel(string filePath)
+        public static Dictionary<String, List<Tarif>> LoadTariffData(string filePath)
         {
             String[] files = { Kalkulator.INNER_ZONE_NAME, Kalkulator.NETWORK_ZONE_NAME, Kalkulator.OUTER_ZONE_NAME, "zvýhodněné jízdné" };
 
@@ -28,14 +28,18 @@ namespace WebPovedCalculator.Models.Calculator
 
             for (int list_index = 0; list_index < files.Length; list_index++)
             {    // iterate over all files
-                List<Tarif> tarifs = IterateOverAllCells(filePath + files[list_index] + ".csv");       // iterate all cells in actual list
+                List<Tarif> tarifs = IterateOverAllCells(filePath + files[list_index] + ".csv");       // iterate over file
                 tarifs_dictionary.Add(files[list_index], tarifs);      // save tarifs to dictionary with zone name as a key          
             }
             return tarifs_dictionary;
         }
 
 
-
+        /// <summary>
+        /// Iterate over all cells in csv file
+        /// </summary>
+        /// <param name="file">File name</param>
+        /// <returns></returns>
         private static List<Tarif> IterateOverAllCells(String file)
         {
             bool isNumeric, isCategory;
