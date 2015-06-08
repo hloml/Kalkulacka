@@ -59,15 +59,15 @@ namespace WebPovedCalculator.Models
         public const String NETWORK_ZONE = "síťová jízdenka";
         
 
-        // list of discounts names
+        // list of discounts names, these discount are not shown in form categories select 
         public static String[] DISCOUNTS_LIST = { ISIC, pensionerFare, schoolFare, halfFare, fullFare, ztpFare, businessFare, studentFare };
 
-        // list of categories not in csv files
-        public static String[] categoriesList = { childFare, adolescentFare, studentFare, adultFare , pensionerTo65Fare, pensionerTo70Fare, pensioner70AndMoreFare, ztpFare, businessFare};
-
+        // list of categories loaded from csv poznamky, which are shown in form categories select 
+        public static List<String> categoriesList;
 
         private static Dictionary<String, List<Tarif>> tarifDictionary;
-        private const String EXCEL_NAME = "operational_tariff_v2.xls";
+        private static Dictionary<String, Dictionary<String, String>> tariffNotes;
+
         private static String EXCEL_PATH;
 
 
@@ -82,11 +82,15 @@ namespace WebPovedCalculator.Models
             {
                 EXCEL_PATH = HttpContext.Current.Server.MapPath("~/Content/tarifs/");
                 tarifDictionary = TarifLoader.LoadTariffData(EXCEL_PATH);
-
+                tariffNotes = TarifLoader.LoadNotes(EXCEL_PATH);
             }
             return tarifDictionary;
         }
 
+        public static Dictionary<String, Dictionary<String, String>> getNotes()
+        {
+            return tariffNotes;
+        }
 
 
         /// <summary>
