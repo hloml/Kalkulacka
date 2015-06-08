@@ -37,6 +37,10 @@ namespace WebPovedCalculator.Models
         public const String OUTER_ZONE_NAME = "předplatné - vnější zóny";
         public const String NETWORK_ZONE_NAME = "síťové jízdné";
         public const String DISCOUNT_ZONE_NAME = "zvýhodněné jízdné";
+        
+        // name of file with notes
+        public const String NOTE_FILE_NAME = "poznámky.csv";
+
 
         // categories for counting on holidays
         public const String ISIC = "ISIC";

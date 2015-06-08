@@ -35,10 +35,15 @@ namespace WebPovedCalculator.Models.Calculator
         }
 
 
+        /// <summary>
+        /// Load notes from csv file
+        /// </summary>
+        /// <param name="file">Path to file</param>
+        /// <returns></returns>
         public static Dictionary<String, Dictionary<String,String>> LoadNotes(String file) {
             int columns_count;
 
-            file = file + "poznámky.csv";
+            file = file + Kalkulator.NOTE_FILE_NAME;
 
             if (!System.IO.File.Exists(file))
             {

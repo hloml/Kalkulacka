@@ -145,7 +145,6 @@ namespace WebPovedCalculator.Models
                     GetPrice("free", Kalkulator.ztpFare, Kalkulator.ztpFare);
                     if (innerZone && !isNetwork)
                     {
-                     //   note = "Cestující se ve vozidlech PMDP prokazuje občanským průkazem, ve vozidlech ostatních dopravců se musí prokázat Plzeňskou kartou s nahraným bezplatným tarifem";
                     }
                     break;
                 case Kalkulator.adultFare:           //Dospely
@@ -161,8 +160,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.studentFare:              //student (15 - 26let)
                     if (discountsSchool)
                     {
-                   //     note = "Při aktivaci jízdného pro zónu 001 Plzeň se musí student prokázat elektronickým potvrzením o studiu nebo potvrzením o studiu na formuláři PMDP. Žákovské jízdné platí pouze pro jízdu z místa trvalého pobytu studenta do místa sídla školy a zpět a to pouze v období aktuálního školního roku. Studenti se musí prokazovat platným žákovským průkazem při aktivaci předplatného jízdného na kartu i při každém odbavení a přepravní kontrole.";
-                        GetPrice(Kalkulator.halfFare, Kalkulator.studentFare, Kalkulator.studentFare);
+                       GetPrice(Kalkulator.halfFare, Kalkulator.studentFare, Kalkulator.studentFare);
                     }
                     else
                     {
@@ -175,8 +173,7 @@ namespace WebPovedCalculator.Models
                 case Kalkulator.adolescentFare:            //dítě (6 - 15 let)
                     if (discountsSchool)
                     {
-                     //   note = "Při aktivaci jízdného pro zónu 001 Plzeň se musí žák prokázat elektronickým potvrzením o studiu nebo potvrzením o studiu na formuláři PMDP. Žákovské jízdné platí pouze pro jízdu z místa trvalého pobytu studenta do místa sídla školy a zpět a to pouze v období aktuálního školního roku. Žáci se musí prokazovat platným žákovským průkazem při aktivaci předplatného jízdného na kartu i při každém odbavení a přepravní kontrole.";
-                        GetPrice(Kalkulator.schoolFare, Kalkulator.schoolFare, Kalkulator.schoolFare);
+                       GetPrice(Kalkulator.schoolFare, Kalkulator.schoolFare, Kalkulator.schoolFare);
                     }
                     else
                     {
@@ -215,15 +212,17 @@ namespace WebPovedCalculator.Models
                     break;
                 case Kalkulator.childFare:                //dítě (do 6 let)
                     price = 0;
-                    //note = "Cestující s předplatným jízdným IDP má nárok na bezplatnou přepravu dvou dětí do 6 let.";
                     break;
                 default:
                     return;
             }
-            setNotes();  
+            setNotes();  // get notes for category
         }
 
 
+        /// <summary>
+        /// Method set notes for customer category
+        /// </summary>
         private void setNotes()
         {
             String value = "";
@@ -266,6 +265,12 @@ namespace WebPovedCalculator.Models
         }
 
 
+        /// <summary>
+        /// Get for category and note type from dictionary with notes
+        /// </summary>
+        /// <param name="category">Customer category</param>
+        /// <param name="noteType">type of note(discount, category, inner zone)</param>
+        /// <returns>Note or empty string, if there is not note</returns>
         private String haveNote(String category, String noteType)
         {
             Dictionary<String, String> dictionary;
@@ -285,7 +290,7 @@ namespace WebPovedCalculator.Models
         /// <summary>
         /// Count best price for janskeho discount 
         /// </summary>
-        /// <param name="categoryInner"></param>
+        /// <param name="categoryInner">pensioner can have free tariff in inner zone</param>
         public void GetPriceForJanskehoDiscount(string categoryInner)
         {
             TarifItemsContainer containerInnerZone;
