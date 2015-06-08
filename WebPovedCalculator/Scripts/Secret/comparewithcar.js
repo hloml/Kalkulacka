@@ -12,70 +12,112 @@ var TariffPriceOnKM;
 
 var rgx = /(\d+)(\d{3})/;
 
-// Slider - fuelConsumption
+var koef;
+
+// Days in week car
 $(function () {
+    $("#compare_mon").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_tue").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_wed").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_thu").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_fri").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_sat").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+    $("#compare_sun").change(function () {
+        countDaysInWeek();
+    })
+  .change();
+});
+
+// Slider - fuelConsumption
+function sliderConsumption(def) {
     $("#fuelConsumption").slider({
-        value: 8.5,
+        value: def,
         min: 1,
         max: 20,
         step: 0.1,
         slide: function (event, ui) {
             $("#fuelConsumptionAmount").val(ui.value + " litr/100km");
+            $("#compare_averageFuelConsumption").val(ui.value.toString().replace(/\./g, ','));
             AverageFuelConsumption = ui.value;
             countAll();
         }
     });
     $("#fuelConsumptionAmount").val($("#fuelConsumption").slider("value") + " litr/100km");
+    $("#compare_averageFuelConsumption").val($("#fuelConsumption").slider("value").toString().replace(/\./g, ','));
     AverageFuelConsumption = $("#fuelConsumption").slider("value");
-});
+}
 // Slider - fuelPrice
-$(function () {
+function sliderPrice(def) {
     $("#fuelPrice").slider({
-        value: 35,
+        value: def,
         min: 10,
         max: 50,
         step: 0.1,
         slide: function (event, ui) {
             $("#fuelPriceAmount").val(ui.value + " Kč/litr");
+            $("#compare_literOfFuelPrice").val(ui.value.toString().replace(/\./g, ','));
             LiterOfFuelPrice = ui.value;
             countAll();
         }
     });
     $("#fuelPriceAmount").val($("#fuelPrice").slider("value") + " Kč/litr");
+    $("#compare_literOfFuelPrice").val($("#fuelPrice").slider("value").toString().replace(/\./g, ','));
     LiterOfFuelPrice = $("#fuelPrice").slider("value");
-});
+}
 // Slider - pathDistance
-$(function () {
+function sliderDistance(def) {
     $("#pathDistance").slider({
-        value: 10,
+        value: def,
         min: 1,
         max: 80,
         step: 1,
         slide: function (event, ui) {
             $("#pathDistanceAmount").val(ui.value + " Km");
+            $("#compare_pathDistance").val(ui.value.toString().replace(/\./g, ','));
             PathDistance = ui.value;
             countAll();
         }
     });
     $("#pathDistanceAmount").val($("#pathDistance").slider("value") + " Km");
+    $("#compare_pathDistance").val($("#pathDistance").slider("value").toString().replace(/\./g, ','));
     PathDistance = $("#pathDistance").slider("value");
-});
+}
 // Slider - parkingPrice
-$(function () {
+function sliderParking(def) {
     $("#parkingPrice").slider({
-        value: 0,
+        value: def,
         min: 0,
         max: 300,
         step: 5,
         slide: function (event, ui) {
             $("#parkingPriceAmount").val(ui.value + " Kč/den");
+            $("#compare_parkingFee").val(ui.value.toString().replace(/\./g, ','));
             ParkingFee = ui.value;
             countAll();
         }
     });
     $("#parkingPriceAmount").val($("#parkingPrice").slider("value") + " Kč/den");
+    $("#compare_parkingFee").val($("#parkingPrice").slider("value").toString().replace(/\./g, ','));
     ParkingFee = $("#parkingPrice").slider("value");
-});
+}
 
 
 // --------------------------------- Core Code
@@ -90,10 +132,10 @@ function countAll() {
         return CarPriceOnKM * PathDistance + ParkingFee;
     }
     function KilometerPriceDiff() {
-        return CarPriceOnKM - TariffPriceOnKM;
+        return (CarPriceOnKM * koef - TariffPriceOnKM);
     }
     function OnDistancePriceDiff() {
-        return KilometerPriceDiff() * PathDistance + ParkingFee;
+        return KilometerPriceDiff() * PathDistance + (ParkingFee * koef);
     }
     function OnPrepaidTimePriceDiff() {
         return OnDistancePriceDiff() * TariffLenght;
@@ -102,7 +144,7 @@ function countAll() {
         if (KilometerPriceDiff() == 0) {
             return 0;
         }
-        return 100 - (100 / (PriceOfPath() / (TariffPrice / TariffLenght)));
+        return 100 - (100 / ((PriceOfPath() * koef) / (TariffPrice / TariffLenght)));
     }
 
     // Results out
@@ -130,10 +172,47 @@ function countAll() {
     }
 }
 
+// counts coeficient of days in week for multiply
+function countDaysInWeek() {
+    var k = 0;
+    if ($("#compare_mon").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_tue").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_wed").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_thu").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_fri").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_sat").is(":checked")) {
+        k = k + 1;
+    }
+    if ($("#compare_sun").is(":checked")) {
+        k = k + 1;
+    }
+    koef = k/7;
+    countAll();
+}
+
 
 // Inicialization, set counted tariff's length and price
-function compareWithCarInit(tariffLenght, tariffPrice) {
+function compareWithCarInit(
+    tariffLenght, tariffPrice, // tariff
+    consumption, price, distance, parking // car´params
+    ) {
     TariffLenght = tariffLenght;
     TariffPrice = tariffPrice;
-    countAll();
+
+    sliderConsumption(consumption);
+    sliderPrice(price);
+    sliderDistance(distance);
+    sliderParking(parking);
+
+    countDaysInWeek();
 }

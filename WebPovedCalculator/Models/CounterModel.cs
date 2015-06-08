@@ -112,6 +112,8 @@ namespace WebPovedCalculator.Models
         /// </summary>
         public Boolean tariffIsLonger { get; set; }
 
+        public CompareWithCar compare { get; set; }
+
         /// <summary>
         /// Sets default values for client's demands
         /// </summary>
@@ -125,7 +127,7 @@ namespace WebPovedCalculator.Models
             startDate = DateTime.Today;
             endDate = DateTime.Today;
 
-
+            compare = new CompareWithCar();
         }
 
 

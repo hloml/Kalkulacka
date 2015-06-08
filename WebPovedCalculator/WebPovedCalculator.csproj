@@ -157,7 +157,7 @@
     <Compile Include="Models\Calculator\TarifItem.cs" />
     <Compile Include="Models\Calculator\TarifItemsContainer.cs" />
     <Compile Include="Models\Calculator\TarifLoader.cs" />
-    <Compile Include="Models\CompareWithCarModel.cs" />
+    <Compile Include="Models\Calculator\CompareWithCar.cs" />
     <Compile Include="Models\CounterModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

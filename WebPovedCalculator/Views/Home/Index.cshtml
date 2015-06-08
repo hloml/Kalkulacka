@@ -110,51 +110,60 @@
             </div>
         </div>
     </div>
-}
 
 
-@if (@Model.innerZone || @Model.zone > 0)
-{
-    // Compare With Car inicialization
-    <script src="~/Scripts/Secret/comparewithcar.js"></script>
-    <script>
-        $(function () {
-            compareWithCarInit(@Model.daysDifference, @Model.price);
-        });
-    </script>
+
+    if (@Model.innerZone || @Model.zone > 0)
+    {
+        // Compare With Car inicialization
+        <script src="~/Scripts/Secret/comparewithcar.js"></script>
+        <script>
+    $(function () {
+        compareWithCarInit(@Model.daysDifference, @Model.price,
+            @Model.compare.averageFuelConsumption.ToString().Replace(",", "."), @Model.compare.literOfFuelPrice.ToString().Replace(",", "."),
+            @Model.compare.pathDistance.ToString().Replace(",", "."), @Model.compare.parkingFee.ToString().Replace(",", "."));
+            });
+        </script>
     
-    <hr />
+        <hr />
     
     
-    // Counted tariff minor results
-    if (@Model.isNetwork || @Model.zone > 0) {
-        if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
-        if (@Model.tarifs != null) {
+        // Counted tariff minor results
+        if (@Model.isNetwork || @Model.zone > 0) {
+            if (@Model.isNetwork) { <h4>Síťové jízdné</h4> } else { <h4>Jízdné pro vnější zóny</h4> }
+            if (@Model.tarifs != null) {
             
-            if (@Model.tarifs.Count > 0)
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
-                    </thead>
-                    <tbody>
+                if (@Model.tarifs.Count > 0)
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+                        </thead>
+                        <tbody>
             
-                        @foreach (var item in Model.tarifs)
-                        {
-                            <tr>
-                                <td>@item.dateStart.ToShortDateString()</td>
-                                <td>@item.dateEnd.ToShortDateString()</td>
-                                <td>@item.days</td>
-                                <td>@item.category</td>
-                                <td>@item.TariffName</td>
-                                <td>
-                                    @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
-                                    @item.price.ToString("n0") Kč
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                            @foreach (var item in Model.tarifs)
+                            {
+                                <tr>
+                                    <td>@item.dateStart.ToShortDateString()</td>
+                                    <td>@item.dateEnd.ToShortDateString()</td>
+                                    <td>@item.days</td>
+                                    <td>@item.category</td>
+                                    <td>@item.TariffName</td>
+                                    <td>
+                                        @if (@Model.zone > 1 && !@Model.isNetwork) { <span class="text-muted">@Model.zone x </span> }
+                                        @item.price.ToString("n0") Kč
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info" role="alert">
+                        <strong>@Model.category:</strong> Jízda ve @if (@Model.isNetwork) { <i>síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
+                    </div>
+                }
             }
             else
             {
@@ -163,39 +172,39 @@
                 </div>
             }
         }
-        else
-        {
-            <div class="alert alert-info" role="alert">
-                <strong>@Model.category:</strong> Jízda ve @if (@Model.isNetwork) { <i>síťovém tarifu</i> } else { <i>vnějších zónách</i> } je <strong>zdarma</strong>.
-            </div>
-        }
-    }
-    <hr />
-    if (!@Model.isNetwork && @Model.innerZone) {
-        <h4>Jízdné pro zónu 001 Plzeň</h4>
-        if (@Model.tarifs != null) {
-            if (@Model.tarifsInner.Count > 0)
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.tarifsInner)
-                        {
-                            <tr>
-                                <td>@item.dateStart.ToShortDateString()</td>
-                                <td>@item.dateEnd.ToShortDateString()</td>
-                                <td>@item.days</td>
-                                <td>@item.category</td>
-                                <td>@item.TariffName</td>
-                                <td>
-                                    @item.price.ToString("n0") Kč
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <hr />
+        if (!@Model.isNetwork && @Model.innerZone) {
+            <h4>Jízdné pro zónu 001 Plzeň</h4>
+            if (@Model.tarifs != null) {
+                if (@Model.tarifsInner.Count > 0)
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr><th>Od</th><th>Do</th><th>Počet dní</th><th>Kategorie</th><th>Typ tarifu</th><th>Cena</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.tarifsInner)
+                            {
+                                <tr>
+                                    <td>@item.dateStart.ToShortDateString()</td>
+                                    <td>@item.dateEnd.ToShortDateString()</td>
+                                    <td>@item.days</td>
+                                    <td>@item.category</td>
+                                    <td>@item.TariffName</td>
+                                    <td>
+                                        @item.price.ToString("n0") Kč
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info" role="alert">
+                        <strong>@Model.category:</strong> Jízda v <i>zóně 001 Plzeň</i> je <strong>zdarma</strong>.
+                    </div>
+                }
             }
             else
             {
@@ -204,163 +213,197 @@
                 </div>
             }
         }
-        else
-        {
-            <div class="alert alert-info" role="alert">
-                <strong>@Model.category:</strong> Jízda v <i>zóně 001 Plzeň</i> je <strong>zdarma</strong>.
-            </div>
-        }
-    }
 
-    // Counted tariff main results
-    <div class="form-group">
-        <h3>
-            <span class="label label-default">Doba: @Model.daysDifference dní</span>
+        // Counted tariff main results
+        <div class="form-group">
+            <h3>
+                <span class="label label-default">Doba: @Model.daysDifference dní</span>
             
-            @if (@Model.zone > 0)
-            {
-                <span class="label label-default">@Html.DisplayNameFor(model => model.zone): @Model.zone</span>
-            }
-            @if (@Model.innerZone)
-            {
-                <span class="label label-default">@Html.DisplayNameFor(model => model.innerZone)</span>
-            }
-            @if (@Model.isNetwork)
-            {
-                <span class="label label-warning">Síťové jízdné</span>
-            }
-        </h3>
-        <h2>
-            <span class="label label-info">Celková cena: @Model.price.ToString("n0") Kč</span>
-        </h2>
-    </div>
+                @if (@Model.zone > 0)
+                {
+                    <span class="label label-default">@Html.DisplayNameFor(model => model.zone): @Model.zone</span>
+                }
+                @if (@Model.innerZone)
+                {
+                    <span class="label label-default">@Html.DisplayNameFor(model => model.innerZone)</span>
+                }
+                @if (@Model.isNetwork)
+                {
+                    <span class="label label-warning">Síťové jízdné</span>
+                }
+            </h3>
+            <h2>
+                <span class="label label-info">Celková cena: @Model.price.ToString("n0") Kč</span>
+            </h2>
+        </div>
 
-            // Note
-            if (@Model.note != null)
-            {
-                <div class="alert alert-warning" role="alert">
-                    <strong>@Model.category:</strong> @Model.note
-                </div>
-            }
-            // Note warning - Date before today
-            if (DateTime.Compare(@Model.startDate, DateTime.Today) < 0)
-            {
-                <div class="alert alert-danger" role="alert">
-                    <strong>Varování:</strong> Zadané datum začátku platnosti tarifu <strong>@Model.startDate.ToShortDateString().Replace(" ", "")</strong> je před aktuálním datem <strong>@DateTime.Today.ToShortDateString().Replace(" ", "")</strong>
-                </div>
-            }
-            // Note warning - tariff's enddate is after user's enddate
-            if (@Model.tariffIsLonger)
-            {
-                <div class="alert alert-success" role="alert">
-                    <strong>Info:</strong> Pro Vámi zvolené období je nejvhodnější předplatné, které přesahuje Vámi zadanou dobu platnosti.
-                </div>
-            }
-    <hr />
-    <hr />
+                // Note
+                if (@Model.note != null)
+                {
+                    <div class="alert alert-warning" role="alert">
+                        <strong>@Model.category:</strong> @Model.note
+                    </div>
+                }
+                // Note warning - Date before today
+                if (DateTime.Compare(@Model.startDate, DateTime.Today) < 0)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Varování:</strong> Zadané datum začátku platnosti tarifu <strong>@Model.startDate.ToShortDateString().Replace(" ", "")</strong> je před aktuálním datem <strong>@DateTime.Today.ToShortDateString().Replace(" ", "")</strong>
+                    </div>
+                }
+                // Note warning - tariff's enddate is after user's enddate
+                if (@Model.tariffIsLonger)
+                {
+                    <div class="alert alert-success" role="alert">
+                        <strong>Info:</strong> Pro Vámi zvolené období je nejvhodnější předplatné, které přesahuje Vámi zadanou dobu platnosti.
+                    </div>
+                }
+        <hr />
+        <hr />
 
-    <h3>Srovnání nákladů: Auto X Veřejná doprava</h3>
-    <hr />
+        <h3>Srovnání nákladů: Auto X Veřejná doprava</h3>
+        <hr />
     
-    // Car - public transport comparsion form
-    <div class="form-horizontal">
+        // Car - public transport comparsion form
+        <div class="form-horizontal">
 
-        <div class="form-group">
-            <label for="fuelConsumptionAmount" class="control-label col-md-4">
-                Průměrná spotřeba paliva:
-                <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
-            </label>
-            <div class="col-md-8">
-                <div id="fuelConsumption" style="margin-top:12px"></div>
+            <div class="form-group">
+                <label for="daysInWeek" class="control-label col-md-2">
+                    Jezdím autem v
+                </label>
+                <div class="col-md-10">
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.mon)
+                        @Html.LabelFor(model => model.compare.mon)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.tue)
+                        @Html.LabelFor(model => model.compare.tue)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.wed)
+                        @Html.LabelFor(model => model.compare.wed)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.thu)
+                        @Html.LabelFor(model => model.compare.thu)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.fri)
+                        @Html.LabelFor(model => model.compare.fri)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.sat)
+                        @Html.LabelFor(model => model.compare.sat)
+                    </label>
+                    <label class="checkbox-inline">
+                        @Html.CheckBoxFor(model => model.compare.sun)
+                        @Html.LabelFor(model => model.compare.sun)
+                    </label>
+                </div>
             </div>
+
+            <div class="form-group">
+                <label for="fuelConsumptionAmount" class="control-label col-md-4">
+                    Průměrná spotřeba paliva:
+                    <input type="text" id="fuelConsumptionAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
+                    @Html.TextBoxFor(model => model.compare.averageFuelConsumption, new { @class = "hidden" })
+                </label>
+                <div class="col-md-8">
+                    <div id="fuelConsumption" style="margin-top:12px"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fuelPriceAmount" class="control-label col-md-4">
+                    Cena paliva:
+                    <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
+                    @Html.TextBoxFor(model => model.compare.literOfFuelPrice, new { @class = "hidden" })
+                </label>
+                <div class="col-md-8">
+                    <div id="fuelPrice" style="margin-top:12px"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pathDistanceAmount" class="control-label col-md-4">
+                    Délka trasy (tam i zpět):
+                    <input type="text" id="pathDistanceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
+                    @Html.TextBoxFor(model => model.compare.pathDistance, new { @class = "hidden" })
+                </label>
+                <div class="col-md-8">
+                    <div id="pathDistance" style="margin-top:12px"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="parkingPriceAmount" class="control-label col-md-4">
+                    Cena parkování:
+                    <input type="text" id="parkingPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
+                    @Html.TextBoxFor(model => model.compare.parkingFee, new { @class = "hidden" })
+                </label>
+                <div class="col-md-8">
+                    <div id="parkingPrice" style="margin-top:12px"></div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label for="fuelPriceAmount" class="control-label col-md-4">
-                Cena paliva:
-                <input type="text" id="fuelPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
-            </label>
-            <div class="col-md-8">
-                <div id="fuelPrice" style="margin-top:12px"></div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="pathDistanceAmount" class="control-label col-md-4">
-                Délka trasy (tam i zpět):
-                <input type="text" id="pathDistanceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
-            </label>
-            <div class="col-md-8">
-                <div id="pathDistance" style="margin-top:12px"></div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="parkingPriceAmount" class="control-label col-md-4">
-                Cena parkování:
-                <input type="text" id="parkingPriceAmount" readonly style="border:0; color:#005EB8; font-weight:bold;" size="12">
-            </label>
-            <div class="col-md-8">
-                <div id="parkingPrice" style="margin-top:12px"></div>
-            </div>
-        </div>
-
-    </div>
-
-    <hr />
+        <hr />
     
-    // Car - public transport comparsion results
-    <div class="form-horizontal">
-        <div class="form-group">
-            <label class="control-label col-md-6" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>
-            <div class="col-md-6">
-                <span class="lead">
-                    <span class="text-info" id="ResultPriceOfPath"></span>
-                </span>
+        // Car - public transport comparsion results
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-6" for="ResultPriceOfPath">Cena jízdy autem tam a zpět (spotřeba + parkovné)</label>
+                <div class="col-md-6">
+                    <span class="lead">
+                        <span class="text-info" id="ResultPriceOfPath"></span>
+                    </span>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-6" for="ResultKilometerPriceDiff">
-                <span class="label saving-loosing"></span>
-                Při jízdě veřejnou dopravou na 1 km
-            </label>
-            <div class="col-md-6">
-                <span class="lead">
-                    <span class="text-success" id="ResultKilometerPriceDiff"></span>
-                </span>
+            <div class="form-group">
+                <label class="control-label col-md-6" for="ResultKilometerPriceDiff">
+                    <span class="label saving-loosing"></span>
+                    Při jízdě veřejnou dopravou na 1 km
+                </label>
+                <div class="col-md-6">
+                    <span class="lead">
+                        <span class="text-success" id="ResultKilometerPriceDiff"></span>
+                    </span>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-6" for="ResultOnDistancePriceDiff">
-                <span class="label saving-loosing"></span>
-                Při jízdě veřejnou dopravou za den
-            </label>
-            <div class="col-md-6">
-                <span class="lead">
-                    <span class="text-success" id="ResultOnDistancePriceDiff"></span>
-                </span>
+            <div class="form-group">
+                <label class="control-label col-md-6" for="ResultOnDistancePriceDiff">
+                    <span class="label saving-loosing"></span>
+                    Při jízdě veřejnou dopravou za den
+                </label>
+                <div class="col-md-6">
+                    <span class="lead">
+                        <span class="text-success" id="ResultOnDistancePriceDiff"></span>
+                    </span>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-6" for="ResultOnPrepaidTimePriceDiff">
-                <span class="label saving-loosing"></span>
-                Při jízdě veřejnou dopravou za předplacené období
-            </label>
-            <div class="col-md-6">
-                <span class="lead">
-                    <span class="text-success" id="ResultOnPrepaidTimePriceDiff"></span>
-                    <span id="smile"></span>
-                </span>
+            <div class="form-group">
+                <label class="control-label col-md-6" for="ResultOnPrepaidTimePriceDiff">
+                    <span class="label saving-loosing"></span>
+                    Při jízdě veřejnou dopravou za předplacené období
+                </label>
+                <div class="col-md-6">
+                    <span class="lead">
+                        <span class="text-success" id="ResultOnPrepaidTimePriceDiff"></span>
+                        <span id="smile"></span>
+                    </span>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-offset-6 col-md-6" style="font-size:large">
-                    <span id="saving" class="label label-success">+ šetřím</span>
-                    <span id="loosing" class="label label-default">- prodělávám</span>
+            <div class="form-group">
+                <div class="col-md-offset-6 col-md-6" style="font-size:large">
+                        <span id="saving" class="label label-success">+ šetřím</span>
+                        <span id="loosing" class="label label-default">- prodělávám</span>
+                </div>
             </div>
+
         </div>
 
-    </div>
 
-
+    }
 }
