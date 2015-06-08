@@ -35,6 +35,65 @@ namespace WebPovedCalculator.Models.Calculator
         }
 
 
+        public static Dictionary<String, Dictionary<String,String>> LoadNotes(String file) {
+            int columns_count;
+
+            file = file + "poznámky.csv";
+
+            if (!System.IO.File.Exists(file))
+            {
+                Console.WriteLine("File " + file + " doesnt exist");
+                return null;
+            }
+
+            var reader = new StreamReader(File.OpenRead(@file));
+            string line = reader.ReadLine().Replace(@"""", "");
+            string[] values = line.Split(';');
+            columns_count = values.Length - 1;
+
+            String[] category = new String[columns_count];
+
+            Dictionary<String, Dictionary<String, String>> dictionary = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<String, String>[] dictionaryForCategory = new Dictionary<string, string>[columns_count];
+
+            for (int j = 0; j < columns_count; j++)      // initiate array of dictionaries
+            {
+                dictionaryForCategory[j] = new Dictionary<string, string>();
+            }
+
+            for (int i = 1; i < values.Length; i++)
+            {
+                category[i - 1] = values[i];
+            }
+
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine().Replace(@"""", "");
+                values = line.Split(';');
+
+                if (!String.IsNullOrEmpty(values[0]))
+                {
+        
+                    for (int i = 1; i < values.Length; i++)
+                    {
+                        if (!String.IsNullOrEmpty(values[i]))
+                        {
+                            dictionaryForCategory[i - 1].Add(values[0], values[i]);
+                        }
+                    }
+                }
+            }
+            List<String> categories = new List<string>();
+
+            for (int i=0; i < columns_count; i++) {
+                dictionary.Add(category[i], dictionaryForCategory[i]);
+                categories.Add(category[i]);
+            }
+            Kalkulator.categoriesList = categories;
+            return dictionary;
+        }
+
+
         /// <summary>
         /// Iterate over all cells in csv file
         /// </summary>
