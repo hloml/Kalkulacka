@@ -573,6 +573,10 @@ namespace WebPovedCalculator.Models
         {
             float totalPrice = 0;
             float price;
+            float bestPrice = float.MaxValue;
+            int daysNumber = days;
+            List<TarifItem> bestTarifItems = new List<TarifItem>();
+
             DateTime tmpDate = startDate;
             TarifItemsContainer container = new TarifItemsContainer();
 
@@ -598,8 +602,52 @@ namespace WebPovedCalculator.Models
                 }
             }
 
-            container.tarifsItems = tarifItems.ToList();
-            container.price = totalPrice;
+
+            if (bestPrice > totalPrice)
+            {
+                bestTarifItems = tarifItems.ToList();
+                bestPrice = totalPrice;
+            }
+            tarifItems.Clear();
+            days = daysNumber;
+            tmpDate = startDate;
+
+           // add 31 days tariff and then count remaining days
+            price = CountDaysPrice(31, parameters);
+            totalPrice = price;
+            tarifItems.Add(CreateTarifItem(31, startDate, tmpDate.AddDays(30), price, DAYS_TARIF, parameters.category));
+            days -= 31;
+            tmpDate = tmpDate.AddDays(31);
+
+            while (days > 0)
+            {
+                if (days > NUMBER_OF_DAYS)
+                {
+                    price = CountDaysPrice(NUMBER_OF_DAYS, parameters);
+                    totalPrice += price;
+                    days -= NUMBER_OF_DAYS;
+                    tarifItems.Add(CreateTarifItem(NUMBER_OF_DAYS, tmpDate, tmpDate.AddDays(NUMBER_OF_DAYS - 1), price, DAYS_TARIF, parameters.category));
+                    tmpDate = tmpDate.AddDays(NUMBER_OF_DAYS);
+                }
+                else
+                {
+                    price = CountDaysPrice(days, parameters);
+                    totalPrice += price;
+
+                    tarifItems.Add(CreateTarifItem(days, tmpDate, tmpDate.AddDays(days - 1), price, DAYS_TARIF, parameters.category));
+                    days = 0;
+                }
+            }
+
+            if (bestPrice > totalPrice)
+            {
+                bestTarifItems = tarifItems.ToList();
+                bestPrice = totalPrice;
+            }
+            tarifItems.Clear();
+
+            container.price = bestPrice;
+            container.tarifsItems = bestTarifItems.ToList();
             return container;
         }
 
